@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Chat vs Boss - Retro Battle Arena</title>
+  <!-- Retro font for arcade feel -->
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <style>
+    /* Global Styles */
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Press Start 2P', cursive;
+      background-color: #000;
+      color: #fff;
+      overflow: hidden;
+      image-rendering: pixelated;
+    }
+    
+    /* CRT screen effect overlay */
+    #crtEffect {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(rgba(18, 16, 16, 0.1) 50%, rgba(0, 0, 0, 0.25) 50%), 
+                  linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+      background-size: 100% 4px, 3px 100%;
+      pointer-events: none;
+      z-index: 100;
+    }
+    
+    /* Main container with scanlines */
+    #gameContainer {
+      width: 100%;
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 20px;
+      box-sizing: border-box;
+      text-align: center;
+      font-size: 0.85em;
+      background-color: #111;
+      position: relative;
+      border: 4px solid #444;
+      box-shadow: 0 0 20px #0ff;
+    }
+    
+    /* Scanlines effect */
+    #gameContainer::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(
+        to bottom,
+        transparent 0%,
+        rgba(0, 255, 255, 0.05) 50%,
+        transparent 100%
+      );
+      background-size: 100% 4px;
+      pointer-events: none;
+      z-index: 1;
+    }
+    
+    .title {
+      font-size: 2em;
+      margin-bottom: 10px;
+      text-shadow: 0 0 10px #0ff, 2px 2px 4px #000;
+      color: #ff0;
+      position: relative;
+    }
+    
+    /* Mode selector buttons */
+    .modeSelector {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 15px;
+    }
+    
+    .modeButton {
+      background: #333;
+      border: 2px solid #555;
+      color: #fff;
+      padding: 8px 15px;
+      margin: 0 5px;
+      font-family: 'Press Start 2P', cursive;
+      font-size: 0.8em;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .modeButton:hover, .modeButton.active {
+      background: #555;
+      border-color: #0ff;
+      color: #0ff;
+      text-shadow: 0 0 5px #0ff;
+    }
+    
+    /* BOSS MODE */
+    #bossContainer {
+      position: relative;
+      width: 100%;
+      height: 360px;
+      margin-bottom: 20px;
+      overflow: hidden;
+      border: 3px solid #444;
+      background: #000;
+      display: block;
+    }
+    
+    /* DUEL MODE */
+    #duelContainer {
+      display: none;
+      position: relative;
+      width: 100%;
+      height: 360px;
+      margin-bottom: 20px;
+      overflow: hidden;
+      border: 3px solid #444;
+      background: #000;
+    }
+    
+    /* Health container at the top */
+    #bossHealthContainer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      padding: 5px 10px;
+      box-sizing: border-box;
+      z-index: 2;
+    }
+    
+    #bossHealthBar {
+      width: 100%;
+      background: #444;
+      border-radius: 10px;
+      overflow: hidden;
+      height: 25px;
+      margin-bottom: 5px;
+      border: 2px solid #222;
+      box-shadow: 0 0 5px #f00;
+    }
+    
+    #bossHealthFill {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, #ff4d4d, #990000);
+      transition: width 0.5s;
+    }
+    
+    #bossHealthText {
+      font-size: 1.1em;
+      font-weight: bold;
+      text-shadow: 1px 1px 3px #000;
+      color: #fff;
+    }
+    
+    /* Boss Avatar Wrapper */
+    #bossAvatarWrapper {
+      position: absolute;
+      top: 60px;
+      left: 50%;
+      transform: translateX(-50%);
+      transition: left 0.5s, top 0.5s;
+      z-index: 1;
+    }
+    
+    #bossAvatar {
+      width: 220px;
+      max-width: 100%;
+      transition: transform 0.2s, opacity 0.2s;
+      image-rendering: pixelated;
+      filter: drop-shadow(0 0 10px rgba(255, 0, 0, 0.7));
+    }
+    
+    /* Blood flash overlay */
+    #bloodFlash {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(255, 0, 0, 0.3);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease-out;
+      z-index: 3;
+    }
+    
+    .bloodVisible {
+      opacity: 1 !important;
+    }
+    
+    /* Boss flicker + shake animation */
+    @keyframes twitchFlicker {
+      0% { opacity: 1; transform: translate(0, 0); }
+      20% { opacity: 0.5; transform: translate(-5px, 5px); }
+      40% { opacity: 1; transform: translate(5px, -5px); }
+      60% { opacity: 0.5; transform: translate(-5px, 5px); }
+      80% { opacity: 1; transform: translate(5px, -5px); }
+      100% { opacity: 1; transform: translate(0, 0); }
+    }
+    
+    .hurt {
+      animation: twitchFlicker 0.3s;
+    }
+    
+    /* DUEL MODE STYLES */
+    .fighter {
+      position: absolute;
+      width: 120px;
+      height: 120px;
+      bottom: 20px;
+      image-rendering: pixelated;
+    }
+    
+    #streamerFighter {
+      left: 20%;
+      transform: translateX(-50%);
+    }
+    
+    #challengerFighter {
+      right: 20%;
+      transform: translateX(50%);
+    }
+    
+    .healthBar {
+      position: absolute;
+      width: 120px;
+      height: 15px;
+      background: #444;
+      border: 2px solid #222;
+      overflow: hidden;
+    }
+    
+    .healthFill {
+      height: 100%;
+      background: linear-gradient(90deg, #ff4d4d, #990000);
+      width: 100%;
+      transition: width 0.3s;
+    }
+    
+    #streamerHealth {
+      top: 10px;
+      left: 20%;
+      transform: translateX(-50%);
+    }
+    
+    #challengerHealth {
+      top: 10px;
+      right: 20%;
+      transform: translateX(50%);
+    }
+    
+    .healthText {
+      position: absolute;
+      font-size: 0.8em;
+      width: 120px;
+      text-align: center;
+    }
+    
+    #streamerHealthText {
+      top: 30px;
+      left: 20%;
+      transform: translateX(-50%);
+    }
+    
+    #challengerHealthText {
+      top: 30px;
+      right: 20%;
+      transform: translateX(50%);
+    }
+    
+    #duelStatus {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 1em;
+      text-align: center;
+      text-shadow: 0 0 5px #0ff;
+      z-index: 2;
+    }
+    
+    /* Duel attack animations */
+    @keyframes attackRight {
+      0% { transform: translateX(50%); }
+      50% { transform: translateX(30%); }
+      100% { transform: translateX(50%); }
+    }
+    
+    @keyframes attackLeft {
+      0% { transform: translateX(-50%); }
+      50% { transform: translateX(-30%); }
+      100% { transform: translateX(-50%); }
+    }
+    
+    .attackingRight {
+      animation: attackRight 0.3s;
+    }
+    
+    .attackingLeft {
+      animation: attackLeft 0.3s;
+    }
+    
+    /* Chat Log styling */
+    #chatLog {
+      height: 200px;
+      overflow-y: auto;
+      background: rgba(0,0,0,0.7);
+      border: 2px solid #555;
+      border-radius: 10px;
+      padding: 10px;
+      margin-bottom: 15px;
+      text-align: left;
+      font-size: 0.8em;
+      box-shadow: inset 0 0 10px #000;
+    }
+    
+    #chatLog div {
+      margin: 5px 0;
+      opacity: 0;
+      animation: fadeIn 0.5s forwards;
+      line-height: 1.4;
+    }
+    
+    @keyframes fadeIn {
+      to { opacity: 1; }
+    }
+    
+    /* Scoreboard styling */
+    #scoreboard {
+      background: rgba(0,0,0,0.7);
+      border: 2px solid #555;
+      border-radius: 10px;
+      padding: 10px;
+      margin-top: 15px;
+      text-align: left;
+      max-height: 200px;
+      overflow-y: auto;
+      font-size: 0.8em;
+      box-shadow: inset 0 0 10px #000;
+    }
+    
+    #scoreboard h2 {
+      margin-top: 0;
+      font-size: 1em;
+      text-align: center;
+      color: #ff0;
+    }
+    
+    #scoreboardContent div {
+      margin-bottom: 10px;
+      line-height: 1.3;
+    }
+    
+    .levelUp {
+      color: #ff0;
+      font-size: 0.8em;
+      margin-left: 5px;
+      animation: levelUpFlash 2s ease-out;
+    }
+    
+    @keyframes levelUpFlash {
+      0% { opacity: 1; text-shadow: 0 0 5px #ff0; }
+      100% { opacity: 0; text-shadow: 0 0 10px #ff0; }
+    }
+    
+    /* Sleek scrollbar styling */
+    #scoreboard::-webkit-scrollbar,
+    #chatLog::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    #scoreboard::-webkit-scrollbar-thumb,
+    #chatLog::-webkit-scrollbar-thumb {
+      background-color: rgba(255,255,255,0.3);
+      border-radius: 3px;
+    }
+  </style>
+</head>
+<body>
+  <!-- CRT screen effect overlay -->
+  <div id="crtEffect"></div>
+  
+  <div id="gameContainer">
+    <h1 class="title">RETRO BATTLE ARENA</h1>
+    
+    <!-- Mode selector -->
+    <div class="modeSelector">
+      <button id="bossModeBtn" class="modeButton active">BOSS MODE</button>
+      <button id="duelModeBtn" class="modeButton">DUEL MODE</button>
+    </div>
+    
+    <!-- Boss Mode Container -->
+    <div id="bossContainer">
+      <!-- Blood flash overlay -->
+      <div id="bloodFlash"></div>
+      
+      <!-- Health container at the top -->
+      <div id="bossHealthContainer">
+        <div id="bossHealthBar">
+          <div id="bossHealthFill"></div>
+        </div>
+        <div id="bossHealthText">1000 / 1000</div>
+      </div>
+      
+      <!-- Boss Avatar below the health container -->
+      <div id="bossAvatarWrapper">
+        <img id="bossAvatar" src="" alt="Evil Boss">
+      </div>
+    </div>
+    
+    <!-- Duel Mode Container -->
+    <div id="duelContainer">
+      <!-- Streamer health -->
+      <div id="streamerHealth" class="healthBar">
+        <div id="streamerHealthFill" class="healthFill"></div>
+      </div>
+      <div id="streamerHealthText" class="healthText">STREAMER: 100/100</div>
+      
+      <!-- Challenger health -->
+      <div id="challengerHealth" class="healthBar">
+        <div id="challengerHealthFill" class="healthFill"></div>
+      </div>
+      <div id="challengerHealthText" class="healthText">CHALLENGER: 100/100</div>
+      
+      <!-- Duel status text -->
+      <div id="duelStatus">Waiting for challenger...</div>
+      
+      <!-- Fighters -->
+      <img id="streamerFighter" class="fighter" src="https://api.dicebear.com/6.x/pixel-art/svg?seed=hero" alt="Streamer">
+      <img id="challengerFighter" class="fighter" src="https://api.dicebear.com/6.x/pixel-art/svg?seed=warrior" alt="Challenger">
+    </div>
+    
+    <!-- Chat log -->
+    <div id="chatLog"></div>
+    
+    <!-- Scoreboard -->
+    <div id="scoreboard">
+      <h2>SCOREBOARD</h2>
+      <div id="scoreboardContent">No players yet.</div>
+    </div>
+    
+    <!-- Challenge notification -->
+    <div id="challengeNotification">
+      <h3>CHALLENGE REQUEST!</h3>
+      <p id="challengeText">USERNAME wants to duel you!</p>
+      <button id="acceptChallenge" class="notificationButton">ACCEPT</button>
+      <button id="declineChallenge" class="notificationButton">DECLINE</button>
+    </div>
+  </div>
+  
+  <script>
+    // ======================
+    // GAME STATE VARIABLES
+    // ======================
+    
+    // Boss mode variables
+    const bossSeeds = [
+      "DarkKnight", "FireDrake", "EvilSlime", "NecroMage",
+      "IronGolem", "ShadowReaper", "DemonLord", "MetalHog",
+      "HauntedArmor", "PoisonWyvern", "PlagueRaven", "AbyssalWorm"
+    ];
+    
+    const bossNames = [
+      "Dark Knight", "Fire Drake", "Evil Slime", "Necro Mage",
+      "Iron Golem", "Shadow Reaper", "Demon Lord", "Metal Hog",
+      "Haunted Armor", "Poison Wyvern", "Plague Raven", "Abyssal Worm"
+    ];
+    
+    let bossLevel = 1;
+    const baseHealth = 1000;
+    let maxHealth = baseHealth;
+    let bossHealth = maxHealth;
+    let currentBossName = "Evil Boss";
+    
+    // Boss strike back chance (30%)
+    const bossStrikeChance = 0.3;
+    
+    // Duel mode variables
+    let streamerHealth = 100;
+    let challengerHealth = 100;
+    let currentChallenger = null;
+    let duelInProgress = false;
+    let duelCooldown = false;
+    
+    // Player ranking: { username: { hp, damage, bossesKilled, xp, level, levelUp } }
+    const ranking = {};
+    const joinedPlayers = new Set();
+    
+    // ======================
+    // DOM ELEMENTS
+    // ======================
+    
+    // Mode selection
+    const bossModeBtn = document.getElementById('bossModeBtn');
+    const duelModeBtn = document.getElementById('duelModeBtn');
+    const bossContainer = document.getElementById('bossContainer');
+    const duelContainer = document.getElementById('duelContainer');
+    
+    // Boss mode elements
+    const bossHealthText = document.getElementById('bossHealthText');
+    const bossHealthFill = document.getElementById('bossHealthFill');
+    const bossAvatar = document.getElementById('bossAvatar');
+    const bossAvatarWrapper = document.getElementById('bossAvatarWrapper');
+    const bloodFlash = document.getElementById('bloodFlash');
+    
+    // Duel mode elements
+    const streamerHealthText = document.getElementById('streamerHealthText');
+    const streamerHealthFill = document.getElementById('streamerHealthFill');
+    const challengerHealthText = document.getElementById('challengerHealthText');
+    const challengerHealthFill = document.getElementById('challengerHealthFill');
+    const duelStatus = document.getElementById('duelStatus');
+    const streamerFighter = document.getElementById('streamerFighter');
+    const challengerFighter = document.getElementById('challengerFighter');
+    
+    // Common elements
+    const chatLog = document.getElementById('chatLog');
+    const scoreboardContent = document.getElementById('scoreboardContent');
+    const challengeNotification = document.getElementById('challengeNotification');
+    const challengeText = document.getElementById('challengeText');
+    const acceptChallenge = document.getElementById('acceptChallenge');
+    const declineChallenge = document.getElementById('declineChallenge');
+    
+    // ======================
+    // UTILITY FUNCTIONS
+    // ======================
+    
+    function updateBossHealth() {
+      if (bossHealth < 0) bossHealth = 0;
+      bossHealthText.textContent = `${bossHealth} / ${maxHealth}`;
+      const percent = (bossHealth / maxHealth) * 100;
+      bossHealthFill.style.width = percent + "%";
+    }
+    
+    function updateDuelHealth() {
+      streamerHealthText.textContent = `STREAMER: ${streamerHealth}/100`;
+      const streamerPercent = (streamerHealth / 100) * 100;
+      streamerHealthFill.style.width = streamerPercent + "%";
+      
+      challengerHealthText.textContent = `CHALLENGER: ${challengerHealth}/100`;
+      const challengerPercent = (challengerHealth / 100) * 100;
+      challengerHealthFill.style.width = challengerPercent + "%";
+    }
+    
+    function updateScoreboard() {
+      const scores = Object.entries(ranking)
+        .sort((a, b) => {
+          if (b[1].bossesKilled === a[1].bossesKilled) {
+            return b[1].damage - a[1].damage;
+          }
+          return b[1].bossesKilled - a[1].bossesKilled;
+        });
+      
+      let html = scores.map(([user, stats]) => {
+        let levelUpText = stats.levelUp ? `<span class="levelUp">LEVEL UP!</span>` : "";
+        let knockedOut = (stats.hp <= 0) ? " [KO]" : "";
+        return `
+          <div>
+            <strong>${user}</strong>${knockedOut}: 
+            HP: ${stats.hp}, 
+            Kills: ${stats.bossesKilled}, 
+            Dmg: ${stats.damage}, 
+            Lvl: ${stats.level} ${levelUpText}<br>
+            <small>XP: ${stats.xp}/${stats.level * 100}</small>
+          </div>`;
+      }).join("");
+      
+      scoreboardContent.innerHTML = html || "No players yet.";
+    }
+    
+    function addChatMessage(message, isCritical = false, isMiss = false) {
+      const messageEl = document.createElement('div');
+      messageEl.textContent = message;
+      
+      if (isCritical) {
+        messageEl.classList.add('criticalHit');
+      } else if (isMiss) {
+        messageEl.classList.add('miss');
+      }
+      
+      chatLog.appendChild(messageEl);
+      chatLog.scrollTop = chatLog.scrollHeight;
+    }
+    
+    function showBloodFlash() {
+      bloodFlash.classList.add('bloodVisible');
+      setTimeout(() => {
+        bloodFlash.classList.remove('bloodVisible');
+      }, 200);
+    }
+    
+    function bossFlicker() {
+      bossAvatar.classList.add('hurt');
+      const dx = Math.floor(Math.random() * 21) - 10;
+      const dy = Math.floor(Math.random() * 11) - 5;
+      bossAvatarWrapper.style.left = `calc(50% + ${dx}px)`;
+      bossAvatarWrapper.style.top = `${60 + dy}px`;
+      setTimeout(() => {
+        bossAvatar.classList.remove('hurt');
+        bossAvatarWrapper.style.left = '50%';
+        bossAvatarWrapper.style.top = '60px';
+      }, 300);
+    }
+    
+    function checkLevelUp(username) {
+      const player = ranking[username];
+      let threshold = player.level * 100;
+      let leveledUp = false;
+      while (player.xp >= threshold) {
+        player.xp -= threshold;
+        player.level++;
+        leveledUp = true;
+        threshold = player.level * 100;
+      }
+      if (leveledUp) {
+        player.levelUp = true;
+        updateScoreboard();
+        setTimeout(() => {
+          player.levelUp = false;
+          updateScoreboard();
+        }, 3000);
+      }
+    }
+    
+    // ======================
+    // BOSS MODE FUNCTIONS
+    // ======================
+    
+    function spawnNewBoss(killer) {
+      bossLevel++;
+      maxHealth = baseHealth + (bossLevel - 1) * 500;
+      bossHealth = maxHealth;
+      updateBossHealth();
+      
+      const idx = Math.floor(Math.random() * bossSeeds.length);
+      currentBossName = bossNames[idx];
+      const randomSeed = bossSeeds[idx] + bossLevel;
+      
+      addChatMessage(`🔥 A new boss: ${currentBossName} (Level ${bossLevel}) has appeared!`);
+      bossAvatar.src = `https://api.dicebear.com/6.x/pixel-art/svg?seed=${randomSeed}`;
+      
+      if (!ranking[killer]) {
+        ranking[killer] = { damage: 0, bossesKilled: 0, xp: 0, level: 1, hp: 100, levelUp: false };
+      }
+      ranking[killer].bossesKilled++;
+      updateScoreboard();
+    }
+    
+    function bossStrikeBack(attacker) {
+      if (Math.random() < bossStrikeChance) {
+        const activePlayers = Object.entries(ranking).filter(([user, stats]) => stats.hp > 0);
+        if (activePlayers.length === 0) return;
+        const rnd = Math.floor(Math.random() * activePlayers.length);
+        const [targetUser, targetStats] = activePlayers[rnd];
+        const dmg = Math.floor(Math.random() * 11) + 5;
+        targetStats.hp -= dmg;
+        if (targetStats.hp < 0) targetStats.hp = 0;
+        addChatMessage(`⚡ ${currentBossName} strikes back at ${targetUser} for ${dmg} damage!`);
+        if (targetStats.hp <= 0) {
+          addChatMessage(`💀 ${targetUser} has been knocked out! Type "!revive" to come back with 50 HP.`);
+        }
+        updateScoreboard();
+      }
+    }
+    
+    function processBossCommand(command, username = "Viewer") {
+      command = command.trim();
+      if (!command) return;
+      
+      if (command.startsWith("!join")) {
+        if (!joinedPlayers.has(username)) {
+          joinedPlayers.add(username);
+          ranking[username] = { damage: 0, bossesKilled: 0, xp: 0, level: 1, hp: 100, levelUp: false };
+          addChatMessage(`🔔 ${username} joined the fight!`);
+        } else {
+          addChatMessage(`ℹ️ ${username}, you have already joined.`);
+        }
+      }
+      else if (command.startsWith("!attack")) {
+        if (!joinedPlayers.has(username)) {
+          addChatMessage(`⚠️ ${username}, please join first by typing !join`);
+          return;
+        }
+        const player = ranking[username];
+        if (player.hp <= 0) {
+          addChatMessage(`😵 ${username}, you're knocked out! Type "!revive" to come back.`);
+          return;
+        }
+        const isCritical = Math.random() < 0.15;
+        let damage = Math.floor(Math.random() * 41) + 10;
+        if (isCritical) {
+          damage = Math.floor(damage * 1.5);
+          addChatMessage(`💥 CRITICAL HIT! ${username} attacks ${currentBossName} for ${damage} damage!`, true);
+        } else {
+          addChatMessage(`⚔️ ${username} attacks ${currentBossName} for ${damage} damage!`);
+        }
+        bossHealth -= damage;
+        player.damage += damage;
+        player.xp += damage;
+        checkLevelUp(username);
+        updateBossHealth();
+        showBloodFlash();
+        bossFlicker();
+        updateScoreboard();
+        if (bossHealth <= 0) {
+          addChatMessage(`💀 ${username} dealt the final blow to ${currentBossName}!`);
+          spawnNewBoss(username);
+        } else {
+          bossStrikeBack(username);
+        }
+      }
+      else if (command.startsWith("!heal")) {
+        if (!joinedPlayers.has(username)) {
+          addChatMessage(`⚠️ ${username}, please join first by typing !join`);
+          return;
+        }
+        const player = ranking[username];
+        if (player.hp <= 0) {
+          addChatMessage(`😵 ${username}, you're knocked out! Use "!revive" instead.`);
+          return;
+        }
+        const heal = Math.floor(Math.random() * 21) + 5;
+        bossHealth += heal;
+        if (bossHealth > maxHealth) bossHealth = maxHealth;
+        addChatMessage(`💖 ${username} heals ${currentBossName} for ${heal} health!`);
+        updateBossHealth();
+      }
+      else if (command.startsWith("!stats")) {
+        if (!joinedPlayers.has(username)) {
+          addChatMessage(`⚠️ ${username}, please join first by typing !join`);
+          return;
+        }
+        const stats = ranking[username];
+        addChatMessage(`📊 ${username} Stats: HP: ${stats.hp}, ${stats.bossesKilled} boss kills, ${stats.damage} dmg, Level ${stats.level} (XP: ${stats.xp}/${stats.level * 100})`);
+      }
+      else if (command.startsWith("!revive")) {
+        if (!joinedPlayers.has(username)) {
+          addChatMessage(`⚠️ ${username}, please join first by typing !join`);
+          return;
+        }
+        const player = ranking[username];
+        if (player.hp > 0) {
+          addChatMessage(`ℹ️ ${username}, you're not knocked out!`);
+          return;
+        }
+        player.hp = 50;
+        addChatMessage(`🌟 ${username} has been revived with 50 HP!`);
+        updateScoreboard();
+      }
+      else if (command.startsWith("!help")) {
+        addChatMessage(`💡 Commands: !join, !attack, !heal, !stats, !revive, !help`);
+      }
+      else {
+        // Ignore unrecognized commands
+      }
+    }
+    
+    // ======================
+    // DUEL MODE FUNCTIONS (basic stub)
+    // ======================
+    
+    function showChallengeNotification(challenger) {
+      challengeText.textContent = `${challenger} wants to duel you!`;
+      currentChallenger = challenger;
+      challengeNotification.style.display = 'block';
+    }
+    
+    function hideChallengeNotification() {
+      challengeNotification.style.display = 'none';
+    }
+    
+    function startDuel(challenger) {
+      if (duelInProgress || duelCooldown) return;
+      duelInProgress = true;
+      currentChallenger = challenger;
+      streamerHealth = 100;
+      challengerHealth = 100;
+      updateDuelHealth();
+      streamerFighter.src = `https://api.dicebear.com/6.x/pixel-art/svg?seed=hero${Date.now()}`;
+      challengerFighter.src = `https://api.dicebear.com/6.x/pixel-art/svg?seed=${challenger}${Date.now()}`;
+      addChatMessage(`⚔️ DUEL STARTED! ${challenger} vs Streamer!`);
+      duelStatus.textContent = "FIGHT!";
+      
+      const duelInterval = setInterval(() => {
+        if (!duelInProgress) {
+          clearInterval(duelInterval);
+          return;
+        }
+        
+        // Streamer auto-attacks
+        setTimeout(() => {
+          if (!duelInProgress) return;
+          const isCritical = Math.random() < 0.1;
+          const missChance = Math.random() < 0.1;
+          let damage = 0;
+          if (missChance) {
+            addChatMessage(`🤺 Streamer attacks ${challenger} but misses!`, false, true);
+          } else {
+            damage = Math.floor(Math.random() * 16) + 5;
+            if (isCritical) {
+              damage = Math.floor(damage * 1.5);
+              addChatMessage(`💥 CRITICAL HIT! Streamer attacks ${challenger} for ${damage} damage!`, true);
+            } else {
+              addChatMessage(`🤺 Streamer attacks ${challenger} for ${damage} damage!`);
+            }
+            challengerHealth -= damage;
+            updateDuelHealth();
+            challengerFighter.classList.add('attackingLeft');
+            setTimeout(() => challengerFighter.classList.remove('attackingLeft'), 300);
+            if (challengerHealth <= 0) {
+              challengerHealth = 0;
+              endDuel("streamer", challenger);
+            }
+          }
+        }, 500);
+        
+        // Challenger auto-attacks
+        setTimeout(() => {
+          if (!duelInProgress) return;
+          const isCritical = Math.random() < 0.15;
+          const missChance = Math.random() < 0.15;
+          let damage = 0;
+          if (missChance) {
+            addChatMessage(`🤺 ${challenger} attacks Streamer but misses!`, false, true);
+          } else {
+            damage = Math.floor(Math.random() * 11) + 5;
+            if (isCritical) {
+              damage = Math.floor(damage * 1.5);
+              addChatMessage(`💥 CRITICAL HIT! ${challenger} attacks Streamer for ${damage} damage!`, true);
+            } else {
+              addChatMessage(`🤺 ${challenger} attacks Streamer for ${damage} damage!`);
+            }
+            streamerHealth -= damage;
+            updateDuelHealth();
+            streamerFighter.classList.add('attackingRight');
+            setTimeout(() => streamerFighter.classList.remove('attackingRight'), 300);
+            if (streamerHealth <= 0) {
+              streamerHealth = 0;
+              endDuel("challenger", challenger);
+            }
+          }
+        }, 1500);
+      }, 2000);
+    }
+    
+    function endDuel(winner, challenger) {
+      duelInProgress = false;
+      duelCooldown = true;
+      if (winner === "streamer") {
+        duelStatus.textContent = "STREAMER WINS!";
+        addChatMessage(`🏆 Streamer defeated ${challenger} in battle!`);
+      } else {
+        duelStatus.textContent = `${challenger} WINS!`;
+        addChatMessage(`🏆 ${challenger} defeated the Streamer in battle!`);
+        if (!ranking[challenger]) {
+          ranking[challenger] = { damage: 0, bossesKilled: 0, xp: 0, level: 1, hp: 100, levelUp: false };
+        }
+        ranking[challenger].xp += 50;
+        checkLevelUp(challenger);
+        updateScoreboard();
+      }
+      setTimeout(() => {
+        duelCooldown = false;
+        duelStatus.textContent = "Waiting for challenger...";
+      }, 10000);
+    }
+    
+    function processDuelCommand(command, username = "Viewer") {
+      command = command.trim();
+      if (!command) return;
+      
+      if (command.startsWith("!challenge")) {
+        if (duelInProgress) {
+          addChatMessage(`⚠️ ${username}, a duel is already in progress!`);
+          return;
+        }
+        if (duelCooldown) {
+          addChatMessage(`⚠️ Duels are on cooldown! Please wait.`);
+          return;
+        }
+        if (currentChallenger) {
+          addChatMessage(`⚠️ ${username}, someone else is already challenging!`);
+          return;
+        }
+        addChatMessage(`⚔️ ${username} has challenged the Streamer to a duel!`);
+        showChallengeNotification(username);
+      }
+      else if (command.startsWith("!join") || command.startsWith("!attack")) {
+        addChatMessage(`⚠️ ${username}, use commands from Boss Mode (switch with buttons above).`);
+      }
+      else if (command.startsWith("!help")) {
+        addChatMessage(`💡 Duel Mode command: !challenge`);
+      }
+      else {
+        // Ignore unrecognized commands
+      }
+    }
+    
+    function showChallengeNotification(challenger) {
+      challengeText.textContent = `${challenger} wants to duel you!`;
+      currentChallenger = challenger;
+      challengeNotification.style.display = 'block';
+    }
+    
+    function hideChallengeNotification() {
+      challengeNotification.style.display = 'none';
+      currentChallenger = null;
+    }
+    
+    // ======================
+    // EVENT LISTENERS
+    // ======================
+    
+    bossModeBtn.addEventListener('click', () => {
+      bossContainer.style.display = 'block';
+      duelContainer.style.display = 'none';
+      bossModeBtn.classList.add('active');
+      duelModeBtn.classList.remove('active');
+      addChatMessage(`🔔 Switched to BOSS MODE! Type !join to participate.`);
+    });
+    
+    duelModeBtn.addEventListener('click', () => {
+      bossContainer.style.display = 'none';
+      duelContainer.style.display = 'block';
+      duelModeBtn.classList.add('active');
+      bossModeBtn.classList.remove('active');
+      addChatMessage(`🔔 Switched to DUEL MODE! Type !challenge to duel the streamer.`);
+    });
+    
+    acceptChallenge.addEventListener('click', () => {
+      hideChallengeNotification();
+      if (currentChallenger) {
+        startDuel(currentChallenger);
+      }
+    });
+    
+    declineChallenge.addEventListener('click', () => {
+      addChatMessage(`❌ Streamer declined the duel with ${currentChallenger}.`);
+      hideChallengeNotification();
+    });
+    
+    // ======================
+    // WEBSOCKET INTEGRATION
+    // ======================
+    
+    const socket = new WebSocket('ws://localhost:55001');
+    
+    socket.addEventListener('open', () => {
+      console.log('WebSocket connection established.');
+      addChatMessage('🔌 Connected to chat server!');
+      // Initially spawn the first boss
+      bossAvatar.src = "https://api.dicebear.com/6.x/pixel-art/svg?seed=evilboss1";
+    });
+    
+    socket.addEventListener('message', (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        console.log('Received command via WebSocket:', data);
+        // Route to mode-specific handlers
+        if (bossContainer.style.display !== 'none') {
+          processBossCommand(data.command, data.username);
+        } else {
+          processDuelCommand(data.command, data.username);
+        }
+      } catch (error) {
+        console.error("Error parsing WebSocket message:", error);
+      }
+    });
+    
+    socket.addEventListener('error', (error) => {
+      console.error("WebSocket error:", error);
+      addChatMessage('⚠️ Connection error with chat server!');
+    });
+    
+    socket.addEventListener('close', () => {
+      console.log('WebSocket connection closed.');
+      addChatMessage('🔌 Disconnected from chat server!');
+    });
+    
+    // ======================
+    // INITIALIZATION
+    // ======================
+    
+    function updateBossModeHealth() {
+      updateBossHealth();
+    }
+    
+    function updateDuelModeHealth() {
+      updateDuelHealth();
+    }
+    
+    // Initialize displays
+    updateBossHealth();
+    updateScoreboard();
+    updateDuelHealth();
+    
+    // Start in Boss Mode by default
+    bossContainer.style.display = 'block';
+    duelContainer.style.display = 'none';
+    addChatMessage('🎮 Welcome to RETRO BATTLE ARENA! Type !join to participate.');
+  </script>
+</body>
+</html>
