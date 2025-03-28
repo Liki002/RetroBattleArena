@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Pixel Boss Battleground</title>
+  <title>Chat vs Boss: Ultimate Pixel Horror</title>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <style>
     /* Global Styles */
@@ -24,8 +24,9 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: linear-gradient(rgba(18, 16, 16, 0.1) 50%, rgba(0, 0, 0, 0.25) 50%), 
-                  linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+      background: 
+        linear-gradient(rgba(18, 16, 16, 0.1) 50%, rgba(0, 0, 0, 0.25) 50%), 
+        linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
       background-size: 100% 4px, 3px 100%;
       pointer-events: none;
       z-index: 100;
@@ -34,7 +35,7 @@
     /* Main container with scanlines */
     #gameContainer {
       width: 100%;
-      max-width: 800px;
+      max-width: 480px;
       margin: 0 auto;
       padding: 20px;
       box-sizing: border-box;
@@ -54,12 +55,7 @@
       left: 0;
       right: 0;
       bottom: 0;
-      background: linear-gradient(
-        to bottom,
-        transparent 0%,
-        rgba(0, 255, 255, 0.05) 50%,
-        transparent 100%
-      );
+      background: linear-gradient(to bottom, transparent 0%, rgba(0, 255, 255, 0.05) 50%, transparent 100%);
       background-size: 100% 4px;
       pointer-events: none;
       z-index: 1;
@@ -120,27 +116,7 @@
       color: #fff;
     }
     
-    /* Phase indicator */
-    #bossPhaseIndicator {
-      position: absolute;
-      top: 40px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(0,0,0,0.7);
-      padding: 5px 10px;
-      border-radius: 5px;
-      border: 2px solid #f00;
-      font-size: 0.8em;
-      opacity: 0;
-      transition: opacity 0.5s;
-      z-index: 3;
-    }
-    
-    .phaseVisible {
-      opacity: 1 !important;
-    }
-    
-    /* Boss Avatar Wrapper */
+    /* Boss Canvas Wrapper */
     #bossAvatarWrapper {
       position: absolute;
       top: 60px;
@@ -155,7 +131,7 @@
       height: 240px;
       max-width: 100%;
       image-rendering: pixelated;
-      filter: drop-shadow(0 0 10px rgba(255, 0, 0, 0.7));
+      filter: drop-shadow(0 0 10px rgba(255, 0, 0, 0.7)) brightness(0.9) contrast(1.2);
     }
     
     /* Blood flash overlay */
@@ -209,28 +185,15 @@
       animation: bossDeath 0.8s ease-out;
     }
     
-    /* Boss attack animation */
-    @keyframes bossAttack {
-      0% { transform: translateX(-50%) scale(1); }
-      20% { transform: translateX(-50%) scale(1.1); }
-      40% { transform: translateX(-50%) scale(0.9); }
-      60% { transform: translateX(-50%) scale(1.05); }
-      80% { transform: translateX(-50%) scale(0.95); }
-      100% { transform: translateX(-50%) scale(1); }
+    /* Boss rage animation */
+    @keyframes bossRage {
+      0% { filter: brightness(1) contrast(1); }
+      50% { filter: brightness(1.5) contrast(1.5); }
+      100% { filter: brightness(1) contrast(1); }
     }
     
-    .bossAttacking {
-      animation: bossAttack 0.5s;
-    }
-    
-    /* Projectile styles */
-    .bossProjectile {
-      position: absolute;
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      z-index: 2;
-      pointer-events: none;
+    .bossRage {
+      animation: bossRage 0.5s infinite;
     }
     
     /* Chat Log styling */
@@ -309,205 +272,143 @@
       font-style: italic;
     }
     
-    /* Player class indicators */
-    .warrior { color: #f55; }
-    .mage { color: #5af; }
-    .rogue { color: #fa5; }
-    .cleric { color: #5f5; }
-    .ranger { color: #8f5; }
-    
-    /* Action buttons */
-    .action-buttons {
+    /* Streamer controls */
+    #streamerControls {
+      position: fixed;
+      bottom: 10px;
+      right: 10px;
+      background: rgba(0,0,0,0.7);
+      border: 2px solid #555;
+      padding: 10px;
+      border-radius: 5px;
+      z-index: 1000;
       display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-bottom: 15px;
+      flex-direction: column;
+      gap: 5px;
     }
     
-    .action-btn {
+    .streamerBtn {
       background: #333;
       border: 2px solid #555;
       color: #fff;
-      padding: 8px 15px;
+      padding: 5px;
       font-family: 'Press Start 2P', cursive;
       font-size: 0.7em;
       cursor: pointer;
-      transition: all 0.2s;
-      flex: 1;
-      min-width: 120px;
     }
     
-    .action-btn:hover {
+    .streamerBtn:hover {
       background: #555;
       border-color: #0ff;
       color: #0ff;
-      text-shadow: 0 0 5px #0ff;
     }
     
-    .action-btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
+    /* TikTok credits display */
+    #creditsDisplay {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      background: rgba(0,0,0,0.7);
+      border: 2px solid #555;
+      padding: 10px;
+      border-radius: 5px;
+      z-index: 1000;
+      font-size: 0.8em;
     }
     
-    /* Cooldown indicators */
-    .cooldown-indicator {
-      height: 5px;
-      background: #444;
-      margin-top: 5px;
+    #creditsCount {
+      color: #ff0;
+      font-weight: bold;
     }
     
-    .cooldown-fill {
-      height: 100%;
-      background: #0ff;
-      width: 0%;
-      transition: width 0.1s linear;
-    }
-    
-    /* Inventory and equipment */
-    #inventoryPanel {
-      display: none;
+    /* Command help */
+    #commandHelp {
       position: fixed;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
       background: rgba(0,0,0,0.9);
-      border: 4px solid #555;
-      border-radius: 10px;
+      border: 3px solid #555;
       padding: 20px;
+      border-radius: 10px;
+      z-index: 1001;
       width: 80%;
-      max-width: 600px;
-      max-height: 80vh;
-      overflow-y: auto;
-      z-index: 1000;
-      box-shadow: 0 0 20px #0ff;
+      max-width: 400px;
+      display: none;
     }
     
-    #inventoryPanel h2 {
-      margin-top: 0;
-      color: #ff0;
-      text-align: center;
+    #closeHelp {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 1.2em;
+      cursor: pointer;
     }
     
-    .inventory-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-      gap: 10px;
-      margin-top: 15px;
-    }
-    
-    .inventory-item {
-      background: rgba(50,50,50,0.5);
+    /* Test command interface */
+    #testInterface {
+      position: fixed;
+      bottom: 10px;
+      left: 10px;
+      background: rgba(0,0,0,0.7);
       border: 2px solid #555;
+      padding: 10px;
       border-radius: 5px;
+      z-index: 1000;
+    }
+    
+    #testCommand {
+      font-family: 'Press Start 2P', cursive;
+      padding: 5px;
+      width: 200px;
+    }
+    
+    #testUsername {
+      font-family: 'Press Start 2P', cursive;
+      padding: 5px;
+      width: 150px;
+      margin-right: 5px;
+    }
+    
+    #sendTestCommand {
+      font-family: 'Press Start 2P', cursive;
       padding: 5px;
       cursor: pointer;
-      transition: all 0.2s;
     }
-    
-    .inventory-item:hover {
-      border-color: #0ff;
-      background: rgba(50,50,50,0.8);
-    }
-    
-    .inventory-item img {
-      width: 100%;
-      height: auto;
-      image-rendering: pixelated;
-    }
-    
-    .inventory-item-name {
-      font-size: 0.7em;
-      margin-top: 5px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    
-    .item-rarity-common { color: #fff; }
-    .item-rarity-uncommon { color: #5f5; }
-    .item-rarity-rare { color: #55f; }
-    .item-rarity-epic { color: #a5f; }
-    .item-rarity-legendary { color: #fa5; }
-    
-    .close-inventory {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      background: #f55;
-      border: none;
-      color: white;
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      cursor: pointer;
-      font-weight: bold;
-    }
-    
-    /* Status effects */
-    .status-effect {
-      display: inline-block;
-      width: 16px;
-      height: 16px;
-      border-radius: 50%;
-      margin-right: 3px;
-      vertical-align: middle;
-    }
-    
-    .status-poison { background: #5f5; }
-    .status-burn { background: #f55; }
-    .status-freeze { background: #5af; }
-    .status-stun { background: #ff5; }
-    .status-buff { background: #5f5; }
-    .status-debuff { background: #f55; }
     
     /* Sleek/invisible scrollbar styling */
     #scoreboard::-webkit-scrollbar,
-    #chatLog::-webkit-scrollbar,
-    #inventoryPanel::-webkit-scrollbar {
+    #chatLog::-webkit-scrollbar {
       width: 6px;
     }
     
     #scoreboard::-webkit-scrollbar-thumb,
-    #chatLog::-webkit-scrollbar-thumb,
-    #inventoryPanel::-webkit-scrollbar-thumb {
+    #chatLog::-webkit-scrollbar-thumb {
       background-color: rgba(255,255,255,0.3);
       border-radius: 3px;
-    }
-    
-    /* Mobile responsiveness */
-    @media (max-width: 600px) {
-      .title {
-        font-size: 1.5em;
-      }
-      
-      .action-buttons {
-        flex-direction: column;
-      }
-      
-      .action-btn {
-        width: 100%;
-      }
     }
   </style>
 </head>
 <body>
   <!-- CRT screen effect overlay -->
   <div id="crtEffect"></div>
-
-  <!-- Hidden input for testing username -->
-  <input type="hidden" id="testUsernameInput" value="Player">
+  
+  <!-- TikTok credits display -->
+  <div id="creditsDisplay">
+    TikTok Credits: <span id="creditsCount">0</span>
+    <div><small>Send gifts to power up!</small></div>
+  </div>
   
   <div id="gameContainer">
-    <h1 class="title">PIXEL BOSS BATTLEGROUND</h1>
+    <h1 class="title">CHAT vs BOSS</h1>
     
     <!-- Boss Container -->
     <div id="bossContainer">
       <!-- Blood flash overlay -->
       <div id="bloodFlash"></div>
-      
-      <!-- Phase indicator -->
-      <div id="bossPhaseIndicator">PHASE 1</div>
       
       <!-- Health container at the top -->
       <div id="bossHealthContainer">
@@ -523,34 +424,8 @@
       </div>
     </div>
     
-    <!-- Action Buttons -->
-    <div class="action-buttons">
-      <div>
-        <button id="attackBtn" class="action-btn">ATTACK</button>
-        <div id="attackCooldown" class="cooldown-indicator">
-          <div id="attackCooldownFill" class="cooldown-fill"></div>
-        </div>
-      </div>
-      <div>
-        <button id="specialAttackBtn" class="action-btn">SPECIAL</button>
-        <div id="specialAttackCooldown" class="cooldown-indicator">
-          <div id="specialAttackCooldownFill" class="cooldown-fill"></div>
-        </div>
-      </div>
-      <div>
-        <button id="ability1Btn" class="action-btn">ABILITY 1</button>
-        <div id="ability1Cooldown" class="cooldown-indicator">
-          <div id="ability1CooldownFill" class="cooldown-fill"></div>
-        </div>
-      </div>
-      <div>
-        <button id="ability2Btn" class="action-btn">ABILITY 2</button>
-        <div id="ability2Cooldown" class="cooldown-indicator">
-          <div id="ability2CooldownFill" class="cooldown-fill"></div>
-        </div>
-      </div>
-      <button id="inventoryBtn" class="action-btn">INVENTORY</button>
-    </div>
+    <!-- Removed clickable special attack button.
+         Special attacks are now triggered by typing "10" in chat -->
     
     <!-- Chat log -->
     <div id="chatLog"></div>
@@ -562,17 +437,39 @@
     </div>
   </div>
   
-  <!-- Inventory Panel -->
-  <div id="inventoryPanel">
-    <button class="close-inventory">X</button>
-    <h2>INVENTORY</h2>
-    <div id="equipmentSlots">
-      <h3>EQUIPPED ITEMS</h3>
-      <div id="equippedItems"></div>
-    </div>
-    <div id="inventoryItems">
-      <h3>INVENTORY</h3>
-      <div class="inventory-grid" id="inventoryGrid"></div>
+  <!-- Streamer controls -->
+  <div id="streamerControls">
+    <h3>STREAMER</h3>
+    <button class="streamerBtn" id="spawnBossBtn">SPAWN BOSS</button>
+    <button class="streamerBtn" id="boostChatBtn">BOOST CHAT (1000)</button>
+    <button class="streamerBtn" id="healBossBtn">HEAL BOSS</button>
+    <button class="streamerBtn" id="rageBossBtn">RAGE BOSS</button>
+    <button class="streamerBtn" id="showHelpBtn">SHOW HELP</button>
+  </div>
+  
+  <!-- Command help modal -->
+  <div id="commandHelp">
+    <button id="closeHelp">✕</button>
+    <h2>HOW TO PLAY</h2>
+    <p>Type numbers in chat to attack:</p>
+    <ul style="text-align: left; list-style-type: none; padding-left: 0;">
+      <li>1-9: Regular attacks (higher numbers do more damage but hit less often)</li>
+      <li>0: Heal boss (10-30 HP)</li>
+      <li>10: Special attack (requires level 5+)</li>
+      <li>!assist: If your combo is 5 or higher, call in an assist attack for bonus damage</li>
+    </ul>
+    <p>Send TikTok gifts to power up attacks!</p>
+    <p>If you are defeated, use <code>!revive</code> to come back.</p>
+  </div>
+  
+  <!-- Test command interface -->
+  <div id="testInterface">
+    <h3>TEST COMMANDS</h3>
+    <input type="text" id="testUsername" value="TestUser" placeholder="Username">
+    <input type="text" id="testCommand" value="1" placeholder="Command (0-10, !revive, !assist)">
+    <button id="sendTestCommand">SEND</button>
+    <div>
+      <button id="testGiftBtn">SEND GIFT (100)</button>
     </div>
   </div>
   
@@ -581,508 +478,150 @@
     // GAME STATE VARIABLES
     // ======================
     
-    // Player classes with abilities
-    const playerClasses = {
-      warrior: {
-        name: "Warrior",
-        description: "Strong melee fighter with high damage and defense",
-        stats: { str: 10, dex: 5, int: 3, vit: 8 },
-        abilities: [
-          {
-            name: "Power Strike",
-            description: "Deals heavy damage with a chance to stun",
-            cooldown: 5,
-            execute: (player) => {
-              const damage = Math.floor(30 + (player.stats.str * 1.5) + Math.floor(Math.random() * 21));
-              const isStun = Math.random() < 0.3;
-              return { damage, effects: isStun ? [{ type: "stun", duration: 2 }] : [] };
-            }
-          },
-          {
-            name: "Taunt",
-            description: "Draws boss attention and reduces damage taken by allies",
-            cooldown: 10,
-            execute: (player) => {
-              return { damage: 0, effects: [{ type: "taunt", duration: 5 }] };
-            }
-          }
-        ]
-      },
-      mage: {
-        name: "Mage",
-        description: "Powerful spellcaster with elemental attacks",
-        stats: { str: 3, dex: 5, int: 10, vit: 4 },
-        abilities: [
-          {
-            name: "Fireball",
-            description: "Launches a fiery projectile that burns the target",
-            cooldown: 4,
-            execute: (player) => {
-              const damage = Math.floor(20 + (player.stats.int * 1.8) + Math.floor(Math.random() * 16));
-              const isBurn = Math.random() < 0.4;
-              return { damage, effects: isBurn ? [{ type: "burn", duration: 3 }] : [] };
-            }
-          },
-          {
-            name: "Arcane Shield",
-            description: "Creates a protective barrier for allies",
-            cooldown: 12,
-            execute: (player) => {
-              return { damage: 0, effects: [{ type: "shield", duration: 6 }] };
-            }
-          }
-        ]
-      },
-      rogue: {
-        name: "Rogue",
-        description: "Quick and deadly with high critical chance",
-        stats: { str: 6, dex: 10, int: 4, vit: 5 },
-        abilities: [
-          {
-            name: "Backstab",
-            description: "Deals massive damage from behind",
-            cooldown: 6,
-            execute: (player) => {
-              const damage = Math.floor(40 + (player.stats.dex * 2) + Math.floor(Math.random() * 31));
-              return { damage, effects: [] };
-            }
-          },
-          {
-            name: "Poison Dart",
-            description: "Poisons the target over time",
-            cooldown: 8,
-            execute: (player) => {
-              const damage = Math.floor(15 + (player.stats.dex * 0.8) + Math.floor(Math.random() * 11));
-              return { damage, effects: [{ type: "poison", duration: 5 }] };
-            }
-          }
-        ]
-      },
-      cleric: {
-        name: "Cleric",
-        description: "Healer and support with holy magic",
-        stats: { str: 4, dex: 4, int: 8, vit: 6 },
-        abilities: [
-          {
-            name: "Heal",
-            description: "Restores health to allies",
-            cooldown: 5,
-            execute: (player) => {
-              const heal = Math.floor(30 + (player.stats.int * 1.5) + Math.floor(Math.random() * 21));
-              return { heal, effects: [] };
-            }
-          },
-          {
-            name: "Smite",
-            description: "Holy attack that deals extra damage to undead",
-            cooldown: 7,
-            execute: (player) => {
-              const isUndead = currentBoss.tags.includes("undead");
-              const damage = Math.floor(25 + (player.stats.int * 1.2) + Math.floor(Math.random() * 16)) * (isUndead ? 1.5 : 1);
-              return { damage, effects: [] };
-            }
-          }
-        ]
-      },
-      ranger: {
-        name: "Ranger",
-        description: "Ranged attacker with animal companions",
-        stats: { str: 5, dex: 8, int: 5, vit: 6 },
-        abilities: [
-          {
-            name: "Multi-Shot",
-            description: "Fires multiple arrows at once",
-            cooldown: 5,
-            execute: (player) => {
-              const hits = 2 + Math.floor(player.stats.dex / 5);
-              let totalDamage = 0;
-              for (let i = 0; i < hits; i++) {
-                totalDamage += Math.floor(10 + (player.stats.dex * 0.8) + Math.floor(Math.random() * 11));
-              }
-              return { damage: totalDamage, effects: [] };
-            }
-          },
-          {
-            name: "Call Companion",
-            description: "Summons an animal to assist in battle",
-            cooldown: 15,
-            execute: (player) => {
-              return { damage: 0, effects: [{ type: "companion", duration: 10 }] };
-            }
-          }
-        ]
-      }
-    };
-    
-    // Boss types with generation parameters
     const bossTypes = [
       {
-        name: "Inferno Dragon",
+        name: "The Flesh Horror",
         healthMultiplier: 1.0,
-        description: "A fire-breathing dragon from the depths of the volcano!",
-        specialWeakness: "ice",
-        palette: ['#330000', '#660000', '#990000', '#cc0000', '#ff0000', '#ff6600', '#ff9900'],
-        complexity: 5,
-        symmetry: 0.7,
-        tags: ["dragon", "fire"],
-        attackPatterns: [
-          {
-            name: "Fire Breath",
-            damage: 50,
-            effect: { type: "burn", duration: 3 },
-            cooldown: 8,
-            execute: () => {
-              // Visual effect for fire breath
-              fireBreathAttack();
-              return { damage: 50, effects: [{ type: "burn", duration: 3 }] };
-            }
-          },
-          {
-            name: "Wing Buffet",
-            damage: 30,
-            effect: { type: "knockback", duration: 1 },
-            cooldown: 5,
-            execute: () => {
-              bossAvatarWrapper.classList.add('bossAttacking');
-              setTimeout(() => bossAvatarWrapper.classList.remove('bossAttacking'), 500);
-              return { damage: 30, effects: [{ type: "knockback", duration: 1 }] };
-            }
-          }
-        ],
-        phases: [
-          { threshold: 0.7, name: "Phase 2: Enraged", effect: "Attack speed increased by 30%" },
-          { threshold: 0.3, name: "Phase 3: Berserk", effect: "Damage increased by 50%" }
-        ]
-      },
-      {
-        name: "Titanium Golem",
-        healthMultiplier: 1.2,
-        description: "A massive metal golem awakened from ancient ruins!",
-        specialWeakness: "lightning",
-        palette: ['#111111', '#333333', '#555555', '#777777', '#999999', '#bbbbbb', '#dddddd'],
-        complexity: 4,
-        symmetry: 0.9,
-        tags: ["construct", "metal"],
-        attackPatterns: [
-          {
-            name: "Crushing Fist",
-            damage: 60,
-            effect: { type: "stun", duration: 1 },
-            cooldown: 6,
-            execute: () => {
-              bossAvatarWrapper.classList.add('bossAttacking');
-              setTimeout(() => bossAvatarWrapper.classList.remove('bossAttacking'), 500);
-              return { damage: 60, effects: [{ type: "stun", duration: 1 }] };
-            }
-          },
-          {
-            name: "Shockwave",
-            damage: 40,
-            effect: { type: "knockback", duration: 1 },
-            cooldown: 10,
-            execute: () => {
-              shockwaveAttack();
-              return { damage: 40, effects: [{ type: "knockback", duration: 1 }] };
-            }
-          }
-        ],
-        phases: [
-          { threshold: 0.6, name: "Phase 2: Overheated", effect: "Takes extra fire damage" },
-          { threshold: 0.2, name: "Phase 3: Core Exposed", effect: "Takes 20% more damage" }
-        ]
-      },
-      {
-        name: "Necro-Lich",
-        healthMultiplier: 0.9,
-        description: "Undead lord of dark magic with a legion of spirits!",
-        specialWeakness: "holy",
-        palette: ['#003300', '#006600', '#009900', '#00cc00', '#00ff00', '#88ff88', '#ccffcc'],
-        complexity: 6,
-        symmetry: 0.6,
-        tags: ["undead", "dark"],
-        attackPatterns: [
-          {
-            name: "Life Drain",
-            damage: 30,
-            effect: { type: "leech", duration: 3 },
-            cooldown: 7,
-            execute: () => {
-              lifeDrainAttack();
-              return { damage: 30, effects: [{ type: "leech", duration: 3 }] };
-            }
-          },
-          {
-            name: "Summon Minions",
-            damage: 20,
-            effect: { type: "summon", duration: 5 },
-            cooldown: 12,
-            execute: () => {
-              summonMinions();
-              return { damage: 20, effects: [{ type: "summon", duration: 5 }] };
-            }
-          }
-        ],
-        phases: [
-          { threshold: 0.75, name: "Phase 2: Soul Harvest", effect: "Heals when dealing damage" },
-          { threshold: 0.4, name: "Phase 3: Death Aura", effect: "Deals damage over time to all players" }
-        ]
-      },
-      {
-        name: "Abyssal Horror",
-        healthMultiplier: 1.1,
-        description: "A grotesque mass of writhing tentacles from the deep!",
+        description: "A writhing mass of flesh and teeth!",
         specialWeakness: "fire",
-        palette: ['#330033', '#660066', '#990099', '#cc00cc', '#ff00ff', '#ff88ff', '#ffccff'],
-        complexity: 7,
-        symmetry: 0.3,
-        tags: ["aberration", "tentacle"],
-        attackPatterns: [
-          {
-            name: "Tentacle Whip",
-            damage: 40,
-            effect: { type: "poison", duration: 4 },
-            cooldown: 5,
-            execute: () => {
-              tentacleWhipAttack();
-              return { damage: 40, effects: [{ type: "poison", duration: 4 }] };
-            }
-          },
-          {
-            name: "Mind Blast",
-            damage: 25,
-            effect: { type: "confuse", duration: 3 },
-            cooldown: 8,
-            execute: () => {
-              mindBlastAttack();
-              return { damage: 25, effects: [{ type: "confuse", duration: 3 }] };
-            }
-          }
-        ],
-        phases: [
-          { threshold: 0.65, name: "Phase 2: Enraged", effect: "Attacks twice as fast" },
-          { threshold: 0.25, name: "Phase 3: Regenerating", effect: "Heals over time" }
-        ]
+        palette: ['#330000', '#660000', '#990000', '#cc0000', '#ff0000'],
+        complexity: 6,
+        symmetry: 0.4,
+        features: ["teeth", "eyes", "tendrils"]
       },
       {
-        name: "Doom Bringer",
-        healthMultiplier: 1.3,
-        description: "Demon lord from the underworld with apocalyptic power!",
+        name: "The Bone Reaper",
+        healthMultiplier: 1.2,
+        description: "A skeletal monstrosity wielding a cursed scythe!",
         specialWeakness: "holy",
-        palette: ['#000033', '#000066', '#000099', '#0000cc', '#0000ff', '#6666ff', '#9999ff'],
+        palette: ['#333333', '#555555', '#777777', '#999999', '#bbbbbb'],
         complexity: 5,
         symmetry: 0.8,
-        tags: ["demon", "dark"],
-        attackPatterns: [
-          {
-            name: "Hellfire",
-            damage: 45,
-            effect: { type: "burn", duration: 4 },
-            cooldown: 6,
-            execute: () => {
-              hellfireAttack();
-              return { damage: 45, effects: [{ type: "burn", duration: 4 }] };
-            }
-          },
-          {
-            name: "Soul Crush",
-            damage: 35,
-            effect: { type: "fear", duration: 2 },
-            cooldown: 9,
-            execute: () => {
-              soulCrushAttack();
-              return { damage: 35, effects: [{ type: "fear", duration: 2 }] };
-            }
-          }
-        ],
-        phases: [
-          { threshold: 0.8, name: "Phase 2: Empowered", effect: "Damage increased by 30%" },
-          { threshold: 0.5, name: "Phase 3: Unholy Aura", effect: "Reduces healing received by players" },
-          { threshold: 0.2, name: "Phase 4: Apocalypse", effect: "Massive damage to all players" }
-        ]
+        features: ["bones", "scythe", "hollow eyes"]
       },
       {
-        name: "Arachnid Queen",
-        healthMultiplier: 0.8,
-        description: "A monstrous spider with venomous fangs and web attacks!",
+        name: "The Void Stalker",
+        healthMultiplier: 0.9,
+        description: "A shadowy entity from beyond reality!",
+        specialWeakness: "light",
+        palette: ['#000033', '#000066', '#000099', '#0000cc', '#0000ff'],
+        complexity: 7,
+        symmetry: 0.6,
+        features: ["void", "tendrils", "glowing eyes"]
+      },
+      {
+        name: "The Plaguebringer",
+        healthMultiplier: 1.1,
+        description: "A rotting abomination dripping with pestilence!",
         specialWeakness: "fire",
-        palette: ['#333300', '#666600', '#999900', '#cccc00', '#ffff00', '#ffff88', '#ffffcc'],
-        complexity: 8,
+        palette: ['#003300', '#006600', '#009900', '#00cc00', '#00ff00'],
+        complexity: 6,
         symmetry: 0.5,
-        tags: ["beast", "spider"],
-        attackPatterns: [
-          {
-            name: "Venom Bite",
-            damage: 30,
-            effect: { type: "poison", duration: 5 },
-            cooldown: 4,
-            execute: () => {
-              venomBiteAttack();
-              return { damage: 30, effects: [{ type: "poison", duration: 5 }] };
-            }
-          },
-          {
-            name: "Web Trap",
-            damage: 20,
-            effect: { type: "root", duration: 4 },
-            cooldown: 7,
-            execute: () => {
-              webTrapAttack();
-              return { damage: 20, effects: [{ type: "root", duration: 4 }] };
-            }
-          }
-        ],
-        phases: [
-          { threshold: 0.6, name: "Phase 2: Egg Sac", effect: "Spawns spiderlings periodically" },
-          { threshold: 0.3, name: "Phase 3: Frenzy", effect: "Attack speed greatly increased" }
-        ]
+        features: ["rot", "pus", "tentacles"]
+      },
+      {
+        name: "The Infernal Demon",
+        healthMultiplier: 1.3,
+        description: "A horned beast from the deepest pits of hell!",
+        specialWeakness: "holy",
+        palette: ['#330033', '#660066', '#990099', '#cc00cc', '#ff00ff'],
+        complexity: 5,
+        symmetry: 0.7,
+        features: ["horns", "fire", "claws"]
+      },
+      {
+        name: "The Many-Eyed Watcher",
+        healthMultiplier: 0.8,
+        description: "A grotesque being covered in blinking eyes!",
+        specialWeakness: "arcane",
+        palette: ['#333300', '#666600', '#999900', '#cccc00', '#ffff00'],
+        complexity: 8,
+        symmetry: 0.3,
+        features: ["eyes", "mouths", "tendrils"]
       }
     ];
     
-    // Item rarities and colors
-    const itemRarities = {
-      common: { name: "Common", color: "#ffffff", multiplier: 1.0 },
-      uncommon: { name: "Uncommon", color: "#5f5", multiplier: 1.2 },
-      rare: { name: "Rare", color: "#55f", multiplier: 1.4 },
-      epic: { name: "Epic", color: "#a5f", multiplier: 1.7 },
-      legendary: { name: "Legendary", color: "#fa5", multiplier: 2.0 }
-    };
-    
-    // Item types with possible stats
-    const itemTypes = {
-      weapon: {
-        name: "Weapon",
-        slots: ["mainHand", "offHand"],
-        stats: ["str", "dex", "int"],
-        prefixes: ["Sharp", "Heavy", "Balanced", "Deadly", "Mighty"],
-        suffixes: ["of Power", "of Destruction", "of Slaying", "of the Warrior", "of the Berserker"]
-      },
-      armor: {
-        name: "Armor",
-        slots: ["head", "chest", "legs", "feet"],
-        stats: ["vit", "armor"],
-        prefixes: ["Sturdy", "Reinforced", "Fortified", "Impenetrable", "Tempered"],
-        suffixes: ["of Defense", "of Protection", "of the Guardian", "of Resilience", "of the Wall"]
-      },
-      accessory: {
-        name: "Accessory",
-        slots: ["ring", "amulet", "trinket"],
-        stats: ["str", "dex", "int", "vit", "armor"],
-        prefixes: ["Shining", "Gleaming", "Ancient", "Mystical", "Arcane"],
-        suffixes: ["of Vitality", "of the Sage", "of Wisdom", "of the Ages", "of the Elements"]
-      }
-    };
-    
-    // Game state variables
     let bossLevel = 1;
     const baseHealth = 1000;
     let maxHealth = baseHealth;
     let bossHealth = maxHealth;
     let currentBoss = bossTypes[0];
-    let currentPhase = 1;
-    let bossAttackCooldown = 0;
-    let bossAttackTimer;
-    let bossEffects = [];
-    let specialAttackCooldown = false;
-    let bossAnimationFrame;
-    let bossAnimationState = 0;
-    let bossAnimationDirection = 1;
+    let isSpecialAttackOnCooldown = false;
+    let isBossEnraged = false;
+    let bossShieldActive = false;
+    let bossPhase = 1;  // New: Tracks transformation phase
+    let tiktokCredits = 0;
+    let chatPower = 1.0;
     
-    // Player ranking system
+    // Player ranking now tracks combo count
     const ranking = {};
     const joinedPlayers = new Set();
-    const playerInventories = {};
-    const playerEquipment = {};
     
     // ======================
     // DOM ELEMENTS
     // ======================
     
-    // Boss mode elements
     const bossHealthText = document.getElementById('bossHealthText');
     const bossHealthFill = document.getElementById('bossHealthFill');
-    const bossPhaseIndicator = document.getElementById('bossPhaseIndicator');
     const bossCanvas = document.getElementById('bossCanvas');
     const bossCtx = bossCanvas.getContext('2d');
     const bossAvatarWrapper = document.getElementById('bossAvatarWrapper');
     const bloodFlash = document.getElementById('bloodFlash');
     
-    // Action buttons
-    const attackBtn = document.getElementById('attackBtn');
-    const specialAttackBtn = document.getElementById('specialAttackBtn');
-    const ability1Btn = document.getElementById('ability1Btn');
-    const ability2Btn = document.getElementById('ability2Btn');
-    const inventoryBtn = document.getElementById('inventoryBtn');
-    
-    // Cooldown indicators
-    const attackCooldownFill = document.getElementById('attackCooldownFill');
-    const specialAttackCooldownFill = document.getElementById('specialAttackCooldownFill');
-    const ability1CooldownFill = document.getElementById('ability1CooldownFill');
-    const ability2CooldownFill = document.getElementById('ability2CooldownFill');
-    
-    // Common elements
     const chatLog = document.getElementById('chatLog');
     const scoreboardContent = document.getElementById('scoreboardContent');
     
-    // Inventory panel elements
-    const inventoryPanel = document.getElementById('inventoryPanel');
-    const inventoryGrid = document.getElementById('inventoryGrid');
-    const equippedItems = document.getElementById('equippedItems');
-    const closeInventoryBtn = document.querySelector('.close-inventory');
+    const spawnBossBtn = document.getElementById('spawnBossBtn');
+    const boostChatBtn = document.getElementById('boostChatBtn');
+    const healBossBtn = document.getElementById('healBossBtn');
+    const rageBossBtn = document.getElementById('rageBossBtn');
+    const showHelpBtn = document.getElementById('showHelpBtn');
+    
+    const creditsCount = document.getElementById('creditsCount');
+    
+    const commandHelp = document.getElementById('commandHelp');
+    const closeHelp = document.getElementById('closeHelp');
+    
+    const testCommandInput = document.getElementById('testCommand');
+    const testUsernameInput = document.getElementById('testUsername');
+    const sendTestCommandBtn = document.getElementById('sendTestCommand');
+    const testGiftBtn = document.getElementById('testGiftBtn');
     
     // ======================
-    // PIXEL BOSS GENERATION
+    // PIXEL BOSS GENERATION (FIXED)
     // ======================
     
     function generatePixelBoss(bossType) {
       const size = 64;
       const grid = [];
-      
-      // Initialize empty grid
       for (let y = 0; y < size; y++) {
         grid[y] = [];
         for (let x = 0; x < size; x++) {
-          grid[y][x] = 0; // 0 = transparent
+          grid[y][x] = 0;
         }
       }
       
-      // Generate boss body with symmetry
       const center = size / 2;
       const complexity = bossType.complexity;
       const symmetry = bossType.symmetry;
       
       for (let layer = 0; layer < complexity; layer++) {
-        const layerSize = size - (layer * 10);
+        const layerSize = size - (layer * 8);
         if (layerSize <= 0) break;
-        
         const startX = Math.floor((size - layerSize) / 2);
         const startY = Math.floor((size - layerSize) / 2);
-        
         for (let y = startY; y < startY + layerSize; y++) {
           for (let x = startX; x < startX + layerSize; x++) {
-            // Skip if already filled
             if (grid[y][x] !== 0) continue;
-            
-            // Determine if we should place a pixel here
-            const distFromCenter = Math.sqrt(
-              Math.pow(x - center, 2) + Math.pow(y - center, 2)
-            );
+            const distFromCenter = Math.sqrt(Math.pow(x - center, 2) + Math.pow(y - center, 2));
             const maxDist = layerSize / 2;
             const normalizedDist = distFromCenter / maxDist;
-            
-            // Base chance based on distance from center (creates circular shape)
             let chance = 1 - normalizedDist;
-            
-            // Add some randomness
-            chance *= 0.5 + Math.random() * 0.5;
-            
-            // Apply layer modifier (outer layers are less dense)
+            chance *= 0.4 + Math.random() * 0.6;
             chance *= 1 - (layer / complexity);
-            
             if (chance > 0.5) {
               const colorIndex = Math.floor(Math.random() * bossType.palette.length);
-              grid[y][x] = colorIndex + 1; // +1 because 0 is transparent
-              
-              // Apply symmetry
+              grid[y][x] = colorIndex + 1;
               if (Math.random() < symmetry) {
                 const symX = size - 1 - x;
                 const symY = size - 1 - y;
@@ -1094,161 +633,80 @@
           }
         }
       }
-      
-      // Add boss-specific features
       addBossFeatures(grid, bossType, center);
-      
-      // Render to canvas
       renderPixelGrid(grid, bossType.palette);
-      
-      // Start animation loop for this boss
-      startBossAnimation(bossType);
     }
     
     function addBossFeatures(grid, bossType, center) {
       const size = grid.length;
-      
-      // Dragon features
-      if (bossType.name.includes("Dragon")) {
-        // Add wings
-        for (let y = 0; y < size; y++) {
-          for (let x = 0; x < size; x++) {
-            if ((x < center - 15 || x > center + 15) && y > center - 10 && y < center + 10) {
-              if (Math.random() < 0.3) {
-                grid[y][x] = Math.floor(Math.random() * bossType.palette.length) + 1;
+      if (bossType.features.includes("eyes")) {
+        const eyeCount = bossType.name.includes("Many-Eyed") ? 8 + Math.floor(Math.random() * 5) : 2;
+        for (let i = 0; i < eyeCount; i++) {
+          let eyeX, eyeY;
+          if (i < 2) {
+            eyeX = center - 10 + (i * 20);
+            eyeY = center - 5;
+          } else {
+            eyeX = center - 15 + Math.floor(Math.random() * 30);
+            eyeY = center - 15 + Math.floor(Math.random() * 30);
+          }
+          for (let y = eyeY - 2; y <= eyeY + 2; y++) {
+            for (let x = eyeX - 2; x <= eyeX + 2; x++) {
+              if (x >= 0 && x < size && y >= 0 && y < size) {
+                grid[y][x] = bossType.palette.length;
               }
             }
           }
-        }
-        
-        // Add fiery breath area
-        for (let y = center - 5; y < center + 5; y++) {
-          for (let x = 0; x < center - 20; x++) {
-            if (Math.random() < 0.4) {
-              grid[y][x] = 5; // Bright color in palette
-            }
-          }
-        }
-        
-        // Add horns
-        for (let i = 0; i < 2; i++) {
-          const hornX = center + (i === 0 ? -8 : 8);
-          for (let y = center - 20; y < center - 10; y++) {
-            if (Math.random() < 0.7) {
-              grid[y][hornX] = 3; // Dark color
-            }
-          }
-        }
-      }
-      // Golem features
-      else if (bossType.name.includes("Golem")) {
-        // Add rocky texture
-        for (let y = 0; y < size; y++) {
-          for (let x = 0; x < size; x++) {
-            if (grid[y][x] !== 0 && Math.random() < 0.2) {
-              grid[y][x] = Math.max(1, grid[y][x] - 1);
-            }
-          }
-        }
-        
-        // Add glowing core
-        for (let y = center - 3; y <= center + 3; y++) {
-          for (let x = center - 3; x <= center + 3; x++) {
-            if (Math.sqrt(Math.pow(x-center,2) + Math.pow(y-center,2)) <= 3) {
-              grid[y][x] = bossType.palette.length; // Brightest color
-            }
-          }
-        }
-      }
-      // Spider features
-      else if (bossType.name.includes("Spider")) {
-        // Add legs
-        for (let i = 0; i < 8; i++) {
-          const angle = (i / 8) * Math.PI * 2;
-          const length = 20 + Math.random() * 10;
-          const thickness = 2;
-          
-          for (let l = 0; l < length; l++) {
-            const legX = Math.round(center + Math.cos(angle) * l);
-            const legY = Math.round(center + Math.sin(angle) * l);
-            
-            for (let t = -thickness; t <= thickness; t++) {
-              const tx = Math.round(legX + Math.cos(angle + Math.PI/2) * t);
-              const ty = Math.round(legY + Math.sin(angle + Math.PI/2) * t);
-              
-              if (tx >= 0 && tx < size && ty >= 0 && ty < size) {
-                grid[ty][tx] = 3; // Middle color in palette
-              }
-            }
-          }
-        }
-        
-        // Add eyes
-        for (let i = 0; i < 8; i++) {
-          const eyeAngle = (i / 8) * Math.PI * 2;
-          const eyeDist = 5 + Math.random() * 3;
-          const eyeX = Math.round(center + Math.cos(eyeAngle) * eyeDist);
-          const eyeY = Math.round(center + Math.sin(eyeAngle) * eyeDist);
-          
           if (eyeX >= 0 && eyeX < size && eyeY >= 0 && eyeY < size) {
-            grid[eyeY][eyeX] = bossType.palette.length; // Brightest color
+            grid[eyeY][eyeX] = 1;
           }
         }
       }
-      // Lich features
-      else if (bossType.name.includes("Lich")) {
-        // Add robe details
-        for (let y = center + 5; y < size; y++) {
-          for (let x = center - 10; x <= center + 10; x++) {
-            if (Math.random() < 0.1) {
-              grid[y][x] = 0; // Create holes in robe
+      
+      if (bossType.features.includes("teeth") || bossType.features.includes("mouths")) {
+        const mouthWidth = 15 + Math.floor(Math.random() * 10);
+        const mouthHeight = 5 + Math.floor(Math.random() * 3);
+        const mouthY = center + 10;
+        for (let x = center - mouthWidth/2; x < center + mouthWidth/2; x++) {
+          for (let y = mouthY; y < mouthY + mouthHeight; y++) {
+            if (x >= 0 && x < size && y >= 0 && y < size) {
+              grid[y][x] = Math.random() < 0.3 ? bossType.palette.length : 1;
             }
           }
         }
-        
-        // Add glowing eyes
-        grid[center-3][center-3] = bossType.palette.length;
-        grid[center-3][center+3] = bossType.palette.length;
       }
-      // Horror features
-      else if (bossType.name.includes("Horror")) {
-        // Add random tentacles
-        for (let i = 0; i < 12; i++) {
-          const angle = Math.random() * Math.PI * 2;
-          const length = 15 + Math.random() * 15;
-          const thickness = 1 + Math.random() * 2;
-          
+      
+      if (bossType.features.includes("tendrils") || bossType.features.includes("tentacles")) {
+        const tendrilCount = 4 + Math.floor(Math.random() * 4);
+        for (let i = 0; i < tendrilCount; i++) {
+          const angle = (i / tendrilCount) * Math.PI * 2;
+          const length = 15 + Math.floor(Math.random() * 10);
+          const thickness = 1 + Math.floor(Math.random() * 2);
           for (let l = 0; l < length; l++) {
-            const tentX = Math.round(center + Math.cos(angle) * l);
-            const tentY = Math.round(center + Math.sin(angle) * l);
-            
+            const tendrilX = Math.round(center + Math.cos(angle) * l);
+            const tendrilY = Math.round(center + Math.sin(angle) * l);
             for (let t = -thickness; t <= thickness; t++) {
-              const tx = Math.round(tentX + Math.cos(angle + Math.PI/2) * t);
-              const ty = Math.round(tentY + Math.sin(angle + Math.PI/2) * t);
-              
+              const tx = Math.round(tendrilX + Math.cos(angle + Math.PI/2) * t);
+              const ty = Math.round(tendrilY + Math.sin(angle + Math.PI/2) * t);
               if (tx >= 0 && tx < size && ty >= 0 && ty < size) {
-                grid[ty][tx] = 2 + Math.floor(Math.random() * 3);
+                grid[ty][tx] = 2;
               }
             }
           }
         }
       }
-      // Demon features
-      else if (bossType.name.includes("Demon")) {
-        // Add horns
+      
+      if (bossType.features.includes("horns")) {
         for (let i = 0; i < 2; i++) {
-          const hornX = center + (i === 0 ? -5 : 5);
-          for (let y = center - 15; y < center - 5; y++) {
-            grid[y][hornX] = 1; // Dark color
-          }
-        }
-        
-        // Add fiery aura
-        for (let y = center - 12; y <= center + 12; y++) {
-          for (let x = center - 12; x <= center + 12; x++) {
-            const dist = Math.sqrt(Math.pow(x-center,2) + Math.pow(y-center,2));
-            if (dist > 10 && dist <= 12 && Math.random() < 0.3) {
-              grid[y][x] = bossType.palette.length; // Bright color
+          const hornX = center - 15 + (i * 30);
+          const hornY = center - 20;
+          const hornLength = 10 + Math.floor(Math.random() * 5);
+          const hornAngle = i === 0 ? -Math.PI/4 : Math.PI/4;
+          for (let l = 0; l < hornLength; l++) {
+            const hx = Math.round(hornX + Math.cos(hornAngle) * l);
+            const hy = Math.round(hornY + Math.sin(hornAngle) * l);
+            if (hx >= 0 && hx < size && hy >= 0 && hy < size) {
+              grid[hy][hx] = 1;
             }
           }
         }
@@ -1258,9 +716,7 @@
     function renderPixelGrid(grid, palette) {
       const size = grid.length;
       const pixelSize = bossCanvas.width / size;
-      
       bossCtx.clearRect(0, 0, bossCanvas.width, bossCanvas.height);
-      
       for (let y = 0; y < size; y++) {
         for (let x = 0; x < size; x++) {
           if (grid[y][x] > 0) {
@@ -1269,1527 +725,73 @@
           }
         }
       }
-    }
-    
-    // ======================
-    // BOSS ANIMATIONS
-    // ======================
-    
-    function startBossAnimation(bossType) {
-      // Cancel any existing animation
-      if (bossAnimationFrame) {
-        cancelAnimationFrame(bossAnimationFrame);
-      }
-      
-      // Set up animation based on boss type
-      if (bossType.name.includes("Dragon")) {
-        animateDragon();
-      } else if (bossType.name.includes("Golem")) {
-        animateGolem();
-      } else if (bossType.name.includes("Spider")) {
-        animateSpider();
-      } else if (bossType.name.includes("Lich")) {
-        animateLich();
-      } else if (bossType.name.includes("Horror")) {
-        animateHorror();
-      } else if (bossType.name.includes("Demon")) {
-        animateDemon();
+      // Apply boss filters; if shield is active, add a blue glow.
+      if (currentBoss.features.includes("void") || currentBoss.features.includes("fire")) {
+        bossCanvas.style.filter = "drop-shadow(0 0 10px rgba(255, 0, 0, 0.7)) brightness(1.1) contrast(1.3)";
       } else {
-        // Default idle animation
-        animateIdle();
+        bossCanvas.style.filter = "drop-shadow(0 0 10px rgba(255, 0, 0, 0.7)) brightness(0.9) contrast(1.2)";
       }
-    }
-    
-    function animateDragon() {
-      const size = 64;
-      const center = size / 2;
-      const grid = [];
-      
-      // Initialize empty grid
-      for (let y = 0; y < size; y++) {
-        grid[y] = [];
-        for (let x = 0; x < size; x++) {
-          grid[y][x] = 0;
-        }
-      }
-      
-      // Generate base body
-      for (let layer = 0; layer < currentBoss.complexity; layer++) {
-        const layerSize = size - (layer * 10);
-        if (layerSize <= 0) break;
-        
-        const startX = Math.floor((size - layerSize) / 2);
-        const startY = Math.floor((size - layerSize) / 2);
-        
-        for (let y = startY; y < startY + layerSize; y++) {
-          for (let x = startX; x < startX + layerSize; x++) {
-            const distFromCenter = Math.sqrt(
-              Math.pow(x - center, 2) + Math.pow(y - center, 2)
-            );
-            const maxDist = layerSize / 2;
-            const normalizedDist = distFromCenter / maxDist;
-            
-            let chance = 1 - normalizedDist;
-            chance *= 0.5 + Math.random() * 0.5;
-            chance *= 1 - (layer / currentBoss.complexity);
-            
-            if (chance > 0.5) {
-              const colorIndex = Math.floor(Math.random() * currentBoss.palette.length);
-              grid[y][x] = colorIndex + 1;
-              
-              if (Math.random() < currentBoss.symmetry) {
-                const symX = size - 1 - x;
-                const symY = size - 1 - y;
-                if (symX >= 0 && symX < size && symY >= 0 && symY < size) {
-                  grid[symY][symX] = colorIndex + 1;
-                }
-              }
-            }
-          }
-        }
-      }
-      
-      // Add animated wings
-      const wingAngle = Math.sin(bossAnimationState * 0.1) * 0.2;
-      for (let y = 0; y < size; y++) {
-        for (let x = 0; x < size; x++) {
-          if ((x < center - 15 || x > center + 15) && y > center - 10 && y < center + 10) {
-            const distFromCenter = Math.sqrt(
-              Math.pow(x - center, 2) + Math.pow(y - center, 2)
-            );
-            
-            if (distFromCenter > 20 && distFromCenter < 30 && Math.random() < 0.5) {
-              const angle = Math.atan2(y - center, x - center);
-              const newAngle = angle + (x < center ? -wingAngle : wingAngle);
-              const newX = center + Math.cos(newAngle) * distFromCenter;
-              const newY = center + Math.sin(newAngle) * distFromCenter;
-              
-              const drawX = Math.floor(newX);
-              const drawY = Math.floor(newY);
-              
-              if (drawX >= 0 && drawX < size && drawY >= 0 && drawY < size) {
-                grid[drawY][drawX] = 4; // Wing color
-              }
-            }
-          }
-        }
-      }
-      
-      // Add animated fire breath
-      if (bossAnimationState % 30 < 15) {
-        for (let y = center - 5; y < center + 5; y++) {
-          for (let x = 0; x < center - 20; x++) {
-            if (Math.random() < 0.4) {
-              grid[y][x] = 5 + Math.floor(Math.random() * 2); // Fire colors
-            }
-          }
-        }
-      }
-      
-      // Add horns
-      for (let i = 0; i < 2; i++) {
-        const hornX = center + (i === 0 ? -8 : 8);
-        for (let y = center - 20; y < center - 10; y++) {
-          if (Math.random() < 0.7) {
-            grid[y][hornX] = 3;
-          }
-        }
-      }
-      
-      renderPixelGrid(grid, currentBoss.palette);
-      
-      bossAnimationState++;
-      bossAnimationFrame = requestAnimationFrame(animateDragon);
-    }
-    
-    function animateGolem() {
-      const size = 64;
-      const center = size / 2;
-      const grid = [];
-      
-      // Initialize empty grid
-      for (let y = 0; y < size; y++) {
-        grid[y] = [];
-        for (let x = 0; x < size; x++) {
-          grid[y][x] = 0;
-        }
-      }
-      
-      // Generate base body
-      for (let layer = 0; layer < currentBoss.complexity; layer++) {
-        const layerSize = size - (layer * 10);
-        if (layerSize <= 0) break;
-        
-        const startX = Math.floor((size - layerSize) / 2);
-        const startY = Math.floor((size - layerSize) / 2);
-        
-        for (let y = startY; y < startY + layerSize; y++) {
-          for (let x = startX; x < startX + layerSize; x++) {
-            const distFromCenter = Math.sqrt(
-              Math.pow(x - center, 2) + Math.pow(y - center, 2)
-            );
-            const maxDist = layerSize / 2;
-            const normalizedDist = distFromCenter / maxDist;
-            
-            let chance = 1 - normalizedDist;
-            chance *= 0.5 + Math.random() * 0.5;
-            chance *= 1 - (layer / currentBoss.complexity);
-            
-            if (chance > 0.5) {
-              const colorIndex = Math.floor(Math.random() * currentBoss.palette.length);
-              grid[y][x] = colorIndex + 1;
-              
-              if (Math.random() < currentBoss.symmetry) {
-                const symX = size - 1 - x;
-                const symY = size - 1 - y;
-                if (symX >= 0 && symX < size && symY >= 0 && symY < size) {
-                  grid[symY][symX] = colorIndex + 1;
-                }
-              }
-            }
-          }
-        }
-      }
-      
-      // Add rocky texture with animation
-      for (let y = 0; y < size; y++) {
-        for (let x = 0; x < size; x++) {
-          if (grid[y][x] !== 0 && Math.random() < 0.2) {
-            const pulse = Math.sin(bossAnimationState * 0.1) * 0.5 + 0.5;
-            if (Math.random() < pulse) {
-              grid[y][x] = Math.max(1, grid[y][x] - 1);
-            }
-          }
-        }
-      }
-      
-      // Add pulsing core
-      const corePulse = Math.sin(bossAnimationState * 0.2) * 0.3 + 0.7;
-      for (let y = center - 3; y <= center + 3; y++) {
-        for (let x = center - 3; x <= center + 3; x++) {
-          if (Math.sqrt(Math.pow(x-center,2) + Math.pow(y-center,2)) <= 3 * corePulse) {
-            grid[y][x] = currentBoss.palette.length;
-          }
-        }
-      }
-      
-      renderPixelGrid(grid, currentBoss.palette);
-      
-      bossAnimationState++;
-      bossAnimationFrame = requestAnimationFrame(animateGolem);
-    }
-    
-    function animateSpider() {
-      const size = 64;
-      const center = size / 2;
-      const grid = [];
-      
-      // Initialize empty grid
-      for (let y = 0; y < size; y++) {
-        grid[y] = [];
-        for (let x = 0; x < size; x++) {
-          grid[y][x] = 0;
-        }
-      }
-      
-      // Generate base body
-      for (let layer = 0; layer < currentBoss.complexity; layer++) {
-        const layerSize = size - (layer * 10);
-        if (layerSize <= 0) break;
-        
-        const startX = Math.floor((size - layerSize) / 2);
-        const startY = Math.floor((size - layerSize) / 2);
-        
-        for (let y = startY; y < startY + layerSize; y++) {
-          for (let x = startX; x < startX + layerSize; x++) {
-            const distFromCenter = Math.sqrt(
-              Math.pow(x - center, 2) + Math.pow(y - center, 2)
-            );
-            const maxDist = layerSize / 2;
-            const normalizedDist = distFromCenter / maxDist;
-            
-            let chance = 1 - normalizedDist;
-            chance *= 0.5 + Math.random() * 0.5;
-            chance *= 1 - (layer / currentBoss.complexity);
-            
-            if (chance > 0.5) {
-              const colorIndex = Math.floor(Math.random() * currentBoss.palette.length);
-              grid[y][x] = colorIndex + 1;
-              
-              if (Math.random() < currentBoss.symmetry) {
-                const symX = size - 1 - x;
-                const symY = size - 1 - y;
-                if (symX >= 0 && symX < size && symY >= 0 && symY < size) {
-                  grid[symY][symX] = colorIndex + 1;
-                }
-              }
-            }
-          }
-        }
-      }
-      
-      // Add animated legs
-      const legAngle = Math.sin(bossAnimationState * 0.15) * 0.3;
-      for (let i = 0; i < 8; i++) {
-        const angle = (i / 8) * Math.PI * 2 + legAngle * (i % 2 === 0 ? 1 : -1);
-        const length = 20 + Math.random() * 10;
-        const thickness = 2;
-        
-        for (let l = 0; l < length; l++) {
-          const legX = Math.round(center + Math.cos(angle) * l);
-          const legY = Math.round(center + Math.sin(angle) * l);
-          
-          for (let t = -thickness; t <= thickness; t++) {
-            const tx = Math.round(legX + Math.cos(angle + Math.PI/2) * t);
-            const ty = Math.round(legY + Math.sin(angle + Math.PI/2) * t);
-            
-            if (tx >= 0 && tx < size && ty >= 0 && ty < size) {
-              grid[ty][tx] = 3;
-            }
-          }
-        }
-      }
-      
-      // Add pulsing eyes
-      const eyePulse = Math.sin(bossAnimationState * 0.2) * 0.5 + 0.5;
-      for (let i = 0; i < 8; i++) {
-        const eyeAngle = (i / 8) * Math.PI * 2;
-        const eyeDist = 5 + Math.random() * 3;
-        const eyeX = Math.round(center + Math.cos(eyeAngle) * eyeDist);
-        const eyeY = Math.round(center + Math.sin(eyeAngle) * eyeDist);
-        
-        if (eyeX >= 0 && eyeX < size && eyeY >= 0 && eyeY < size) {
-          if (Math.random() < eyePulse) {
-            grid[eyeY][eyeX] = currentBoss.palette.length;
-          }
-        }
-      }
-      
-      renderPixelGrid(grid, currentBoss.palette);
-      
-      bossAnimationState++;
-      bossAnimationFrame = requestAnimationFrame(animateSpider);
-    }
-    
-    function animateLich() {
-      const size = 64;
-      const center = size / 2;
-      const grid = [];
-      
-      // Initialize empty grid
-      for (let y = 0; y < size; y++) {
-        grid[y] = [];
-        for (let x = 0; x < size; x++) {
-          grid[y][x] = 0;
-        }
-      }
-      
-      // Generate base body
-      for (let layer = 0; layer < currentBoss.complexity; layer++) {
-        const layerSize = size - (layer * 10);
-        if (layerSize <= 0) break;
-        
-        const startX = Math.floor((size - layerSize) / 2);
-        const startY = Math.floor((size - layerSize) / 2);
-        
-        for (let y = startY; y < startY + layerSize; y++) {
-          for (let x = startX; x < startX + layerSize; x++) {
-            const distFromCenter = Math.sqrt(
-              Math.pow(x - center, 2) + Math.pow(y - center, 2)
-            );
-            const maxDist = layerSize / 2;
-            const normalizedDist = distFromCenter / maxDist;
-            
-            let chance = 1 - normalizedDist;
-            chance *= 0.5 + Math.random() * 0.5;
-            chance *= 1 - (layer / currentBoss.complexity);
-            
-            if (chance > 0.5) {
-              const colorIndex = Math.floor(Math.random() * currentBoss.palette.length);
-              grid[y][x] = colorIndex + 1;
-              
-              if (Math.random() < currentBoss.symmetry) {
-                const symX = size - 1 - x;
-                const symY = size - 1 - y;
-                if (symX >= 0 && symX < size && symY >= 0 && symY < size) {
-                  grid[symY][symX] = colorIndex + 1;
-                }
-              }
-            }
-          }
-        }
-      }
-      
-      // Add animated robe details
-      const robeWave = Math.sin(bossAnimationState * 0.1);
-      for (let y = center + 5; y < size; y++) {
-        for (let x = center - 10; x <= center + 10; x++) {
-          const waveOffset = Math.floor(robeWave * 2);
-          if ((x + waveOffset) % 4 === 0 && Math.random() < 0.1) {
-            grid[y][x] = 0;
-          }
-        }
-      }
-      
-      // Add pulsing eyes
-      const eyePulse = Math.sin(bossAnimationState * 0.2) * 0.5 + 0.5;
-      if (Math.random() < eyePulse) {
-        grid[center-3][center-3] = currentBoss.palette.length;
-        grid[center-3][center+3] = currentBoss.palette.length;
-      }
-      
-      // Add floating orbs
-      if (bossAnimationState % 30 < 15) {
-        for (let i = 0; i < 3; i++) {
-          const orbAngle = bossAnimationState * 0.1 + i * Math.PI * 2 / 3;
-          const orbDist = 15;
-          const orbX = Math.floor(center + Math.cos(orbAngle) * orbDist);
-          const orbY = Math.floor(center + Math.sin(orbAngle) * orbDist);
-          
-          if (orbX >= 0 && orbX < size && orbY >= 0 && orbY < size) {
-            grid[orbY][orbX] = currentBoss.palette.length;
-          }
-        }
-      }
-      
-      renderPixelGrid(grid, currentBoss.palette);
-      
-      bossAnimationState++;
-      bossAnimationFrame = requestAnimationFrame(animateLich);
-    }
-    
-    function animateHorror() {
-      const size = 64;
-      const center = size / 2;
-      const grid = [];
-      
-      // Initialize empty grid
-      for (let y = 0; y < size; y++) {
-        grid[y] = [];
-        for (let x = 0; x < size; x++) {
-          grid[y][x] = 0;
-        }
-      }
-      
-      // Generate base body
-      for (let layer = 0; layer < currentBoss.complexity; layer++) {
-        const layerSize = size - (layer * 10);
-        if (layerSize <= 0) break;
-        
-        const startX = Math.floor((size - layerSize) / 2);
-        const startY = Math.floor((size - layerSize) / 2);
-        
-        for (let y = startY; y < startY + layerSize; y++) {
-          for (let x = startX; x < startX + layerSize; x++) {
-            const distFromCenter = Math.sqrt(
-              Math.pow(x - center, 2) + Math.pow(y - center, 2)
-            );
-            const maxDist = layerSize / 2;
-            const normalizedDist = distFromCenter / maxDist;
-            
-            let chance = 1 - normalizedDist;
-            chance *= 0.5 + Math.random() * 0.5;
-            chance *= 1 - (layer / currentBoss.complexity);
-            
-            if (chance > 0.5) {
-              const colorIndex = Math.floor(Math.random() * currentBoss.palette.length);
-              grid[y][x] = colorIndex + 1;
-              
-              if (Math.random() < currentBoss.symmetry) {
-                const symX = size - 1 - x;
-                const symY = size - 1 - y;
-                if (symX >= 0 && symX < size && symY >= 0 && symY < size) {
-                  grid[symY][symX] = colorIndex + 1;
-                }
-              }
-            }
-          }
-        }
-      }
-      
-      // Add writhing tentacles
-      const tentacleWave = bossAnimationState * 0.1;
-      for (let i = 0; i < 12; i++) {
-        const angle = Math.random() * Math.PI * 2;
-        const length = 15 + Math.random() * 15;
-        const thickness = 1 + Math.random() * 2;
-        
-        for (let l = 0; l < length; l++) {
-          const wave = Math.sin(tentacleWave + l * 0.3) * 2;
-          const tentX = Math.round(center + Math.cos(angle + wave * 0.1) * l);
-          const tentY = Math.round(center + Math.sin(angle + wave * 0.1) * l);
-          
-          for (let t = -thickness; t <= thickness; t++) {
-            const tx = Math.round(tentX + Math.cos(angle + Math.PI/2) * t);
-            const ty = Math.round(tentY + Math.sin(angle + Math.PI/2) * t);
-            
-            if (tx >= 0 && tx < size && ty >= 0 && ty < size) {
-              grid[ty][tx] = 2 + Math.floor(Math.random() * 3);
-            }
-          }
-        }
-      }
-      
-      // Add pulsating core
-      const corePulse = Math.sin(bossAnimationState * 0.15) * 0.5 + 0.5;
-      for (let y = center - 5; y <= center + 5; y++) {
-        for (let x = center - 5; x <= center + 5; x++) {
-          if (Math.sqrt(Math.pow(x-center,2) + Math.pow(y-center,2)) <= 5 * corePulse) {
-            grid[y][x] = currentBoss.palette.length;
-          }
-        }
-      }
-      
-      renderPixelGrid(grid, currentBoss.palette);
-      
-      bossAnimationState++;
-      bossAnimationFrame = requestAnimationFrame(animateHorror);
-    }
-    
-    function animateDemon() {
-      const size = 64;
-      const center = size / 2;
-      const grid = [];
-      
-      // Initialize empty grid
-      for (let y = 0; y < size; y++) {
-        grid[y] = [];
-        for (let x = 0; x < size; x++) {
-          grid[y][x] = 0;
-        }
-      }
-      
-      // Generate base body
-      for (let layer = 0; layer < currentBoss.complexity; layer++) {
-        const layerSize = size - (layer * 10);
-        if (layerSize <= 0) break;
-        
-        const startX = Math.floor((size - layerSize) / 2);
-        const startY = Math.floor((size - layerSize) / 2);
-        
-        for (let y = startY; y < startY + layerSize; y++) {
-          for (let x = startX; x < startX + layerSize; x++) {
-            const distFromCenter = Math.sqrt(
-              Math.pow(x - center, 2) + Math.pow(y - center, 2)
-            );
-            const maxDist = layerSize / 2;
-            const normalizedDist = distFromCenter / maxDist;
-            
-            let chance = 1 - normalizedDist;
-            chance *= 0.5 + Math.random() * 0.5;
-            chance *= 1 - (layer / currentBoss.complexity);
-            
-            if (chance > 0.5) {
-              const colorIndex = Math.floor(Math.random() * currentBoss.palette.length);
-              grid[y][x] = colorIndex + 1;
-              
-              if (Math.random() < currentBoss.symmetry) {
-                const symX = size - 1 - x;
-                const symY = size - 1 - y;
-                if (symX >= 0 && symX < size && symY >= 0 && symY < size) {
-                  grid[symY][symX] = colorIndex + 1;
-                }
-              }
-            }
-          }
-        }
-      }
-      
-      // Add animated horns
-      const hornWave = Math.sin(bossAnimationState * 0.1) * 0.2;
-      for (let i = 0; i < 2; i++) {
-        const hornAngle = i === 0 ? -Math.PI/4 : Math.PI/4;
-        const hornLength = 10;
-        
-        for (let l = 0; l < hornLength; l++) {
-          const hornX = Math.round(center + (i === 0 ? -5 : 5) + Math.cos(hornAngle + hornWave) * l);
-          const hornY = Math.round(center - 15 + Math.sin(hornAngle + hornWave) * l);
-          
-          if (hornX >= 0 && hornX < size && hornY >= 0 && hornY < size) {
-            grid[hornY][hornX] = 1;
-          }
-        }
-      }
-      
-      // Add animated fiery aura
-      const auraPulse = Math.sin(bossAnimationState * 0.15) * 0.3 + 0.7;
-      for (let y = center - 12; y <= center + 12; y++) {
-        for (let x = center - 12; x <= center + 12; x++) {
-          const dist = Math.sqrt(Math.pow(x-center,2) + Math.pow(y-center,2));
-          if (dist > 10 && dist <= 12 * auraPulse && Math.random() < 0.3) {
-            grid[y][x] = currentBoss.palette.length;
-          }
-        }
-      }
-      
-      // Add animated wings
-      if (bossAnimationState % 40 < 20) {
-        for (let i = 0; i < 2; i++) {
-          const wingX = center + (i === 0 ? -15 : 15);
-          for (let y = center - 10; y <= center + 10; y++) {
-            for (let x = i === 0 ? wingX - 5 : wingX; x <= (i === 0 ? wingX : wingX + 5); x++) {
-              if (Math.random() < 0.4) {
-                grid[y][x] = 4;
-              }
-            }
-          }
-        }
-      }
-      
-      renderPixelGrid(grid, currentBoss.palette);
-      
-      bossAnimationState++;
-      bossAnimationFrame = requestAnimationFrame(animateDemon);
-    }
-    
-    function animateIdle() {
-      const size = 64;
-      const center = size / 2;
-      const grid = [];
-      
-      // Initialize empty grid
-      for (let y = 0; y < size; y++) {
-        grid[y] = [];
-        for (let x = 0; x < size; x++) {
-          grid[y][x] = 0;
-        }
-      }
-      
-      // Generate base body
-      for (let layer = 0; layer < currentBoss.complexity; layer++) {
-        const layerSize = size - (layer * 10);
-        if (layerSize <= 0) break;
-        
-        const startX = Math.floor((size - layerSize) / 2);
-        const startY = Math.floor((size - layerSize) / 2);
-        
-        for (let y = startY; y < startY + layerSize; y++) {
-          for (let x = startX; x < startX + layerSize; x++) {
-            const distFromCenter = Math.sqrt(
-              Math.pow(x - center, 2) + Math.pow(y - center, 2)
-            );
-            const maxDist = layerSize / 2;
-            const normalizedDist = distFromCenter / maxDist;
-            
-            let chance = 1 - normalizedDist;
-            chance *= 0.5 + Math.random() * 0.5;
-            chance *= 1 - (layer / currentBoss.complexity);
-            
-            if (chance > 0.5) {
-              const colorIndex = Math.floor(Math.random() * currentBoss.palette.length);
-              grid[y][x] = colorIndex + 1;
-              
-              if (Math.random() < currentBoss.symmetry) {
-                const symX = size - 1 - x;
-                const symY = size - 1 - y;
-                if (symX >= 0 && symX < size && symY >= 0 && symY < size) {
-                  grid[symY][symX] = colorIndex + 1;
-                }
-              }
-            }
-          }
-        }
-      }
-      
-      // Add simple pulsing animation
-      const pulse = Math.sin(bossAnimationState * 0.1) * 0.05 + 1;
-      for (let y = 0; y < size; y++) {
-        for (let x = 0; x < size; x++) {
-          if (grid[y][x] > 0 && Math.random() < 0.1) {
-            const newX = Math.floor(center + (x - center) * pulse);
-            const newY = Math.floor(center + (y - center) * pulse);
-            
-            if (newX >= 0 && newX < size && newY >= 0 && newY < size) {
-              grid[newY][newX] = grid[y][x];
-              if (Math.random() < 0.3) grid[y][x] = 0;
-            }
-          }
-        }
-      }
-      
-      renderPixelGrid(grid, currentBoss.palette);
-      
-      bossAnimationState++;
-      bossAnimationFrame = requestAnimationFrame(animateIdle);
-    }
-    
-    // ======================
-    // BOSS ATTACK EFFECTS
-    // ======================
-    
-    function fireBreathAttack() {
-      const bossRect = bossAvatarWrapper.getBoundingClientRect();
-      const bossX = bossRect.left + bossRect.width / 2;
-      const bossY = bossRect.top + bossRect.height / 2;
-      
-      // Create fire breath effect
-      const fireBreath = document.createElement('div');
-      fireBreath.className = 'bossProjectile';
-      fireBreath.style.background = 'radial-gradient(circle, #ff6600, #ff0000)';
-      fireBreath.style.width = '300px';
-      fireBreath.style.height = '100px';
-      fireBreath.style.left = `${bossX - 300}px`;
-      fireBreath.style.top = `${bossY - 50}px`;
-      fireBreath.style.borderRadius = '50px';
-      fireBreath.style.boxShadow = '0 0 20px #ff6600';
-      document.body.appendChild(fireBreath);
-      
-      // Animate fire breath
-      let width = 300;
-      const fireInterval = setInterval(() => {
-        width -= 20;
-        fireBreath.style.width = `${width}px`;
-        fireBreath.style.left = `${bossX - width}px`;
-        
-        if (width <= 0) {
-          clearInterval(fireInterval);
-          fireBreath.remove();
-        }
-      }, 50);
-      
-      bossAvatarWrapper.classList.add('bossAttacking');
-      setTimeout(() => bossAvatarWrapper.classList.remove('bossAttacking'), 500);
-    }
-    
-    function shockwaveAttack() {
-      const bossRect = bossAvatarWrapper.getBoundingClientRect();
-      const bossX = bossRect.left + bossRect.width / 2;
-      const bossY = bossRect.top + bossRect.height / 2;
-      
-      // Create shockwave effect
-      const shockwave = document.createElement('div');
-      shockwave.className = 'bossProjectile';
-      shockwave.style.background = 'radial-gradient(circle, rgba(255,255,255,0.8), rgba(200,200,255,0))';
-      shockwave.style.width = '50px';
-      shockwave.style.height = '50px';
-      shockwave.style.left = `${bossX - 25}px`;
-      shockwave.style.top = `${bossY - 25}px`;
-      shockwave.style.borderRadius = '50%';
-      shockwave.style.boxShadow = '0 0 10px #fff';
-      document.body.appendChild(shockwave);
-      
-      // Animate shockwave
-      let size = 50;
-      let opacity = 0.8;
-      const shockInterval = setInterval(() => {
-        size += 20;
-        opacity -= 0.05;
-        shockwave.style.width = `${size}px`;
-        shockwave.style.height = `${size}px`;
-        shockwave.style.left = `${bossX - size/2}px`;
-        shockwave.style.top = `${bossY - size/2}px`;
-        shockwave.style.opacity = opacity;
-        
-        if (opacity <= 0) {
-          clearInterval(shockInterval);
-          shockwave.remove();
-        }
-      }, 50);
-      
-      bossAvatarWrapper.classList.add('bossAttacking');
-      setTimeout(() => bossAvatarWrapper.classList.remove('bossAttacking'), 500);
-    }
-    
-    function lifeDrainAttack() {
-      const bossRect = bossAvatarWrapper.getBoundingClientRect();
-      const bossX = bossRect.left + bossRect.width / 2;
-      const bossY = bossRect.top + bossRect.height / 2;
-      
-      // Create life drain orbs
-      for (let i = 0; i < 3; i++) {
-        const orb = document.createElement('div');
-        orb.className = 'bossProjectile';
-        orb.style.background = 'radial-gradient(circle, #00ff00, #003300)';
-        orb.style.width = '20px';
-        orb.style.height = '20px';
-        orb.style.left = `${bossX - 10}px`;
-        orb.style.top = `${bossY - 10}px`;
-        orb.style.borderRadius = '50%';
-        orb.style.boxShadow = '0 0 10px #00ff00';
-        document.body.appendChild(orb);
-        
-        // Random player position for animation target
-        const targetX = bossX + (Math.random() * 400 - 200);
-        const targetY = bossY + (Math.random() * 200 - 100);
-        
-        // Animate orb
-        let progress = 0;
-        const orbInterval = setInterval(() => {
-          progress += 0.05;
-          const x = bossX + (targetX - bossX) * progress;
-          const y = bossY + (targetY - bossY) * progress;
-          
-          orb.style.left = `${x - 10}px`;
-          orb.style.top = `${y - 10}px`;
-          orb.style.opacity = 1 - progress;
-          
-          if (progress >= 1) {
-            clearInterval(orbInterval);
-            orb.remove();
-            
-            // Create return orb
-            if (i === 2) {
-              const returnOrb = document.createElement('div');
-              returnOrb.className = 'bossProjectile';
-              returnOrb.style.background = 'radial-gradient(circle, #ff0000, #990000)';
-              returnOrb.style.width = '20px';
-              returnOrb.style.height = '20px';
-              returnOrb.style.left = `${targetX - 10}px`;
-              returnOrb.style.top = `${targetY - 10}px`;
-              returnOrb.style.borderRadius = '50%';
-              returnOrb.style.boxShadow = '0 0 10px #ff0000';
-              document.body.appendChild(returnOrb);
-              
-              let returnProgress = 0;
-              const returnInterval = setInterval(() => {
-                returnProgress += 0.05;
-                const x = targetX + (bossX - targetX) * returnProgress;
-                const y = targetY + (bossY - targetY) * returnProgress;
-                
-                returnOrb.style.left = `${x - 10}px`;
-                returnOrb.style.top = `${y - 10}px`;
-                
-                if (returnProgress >= 1) {
-                  clearInterval(returnInterval);
-                  returnOrb.remove();
-                }
-              }, 50);
-            }
-          }
-        }, 50);
-      }
-      
-      bossAvatarWrapper.classList.add('bossAttacking');
-      setTimeout(() => bossAvatarWrapper.classList.remove('bossAttacking'), 500);
-    }
-    
-    function summonMinions() {
-      const bossRect = bossAvatarWrapper.getBoundingClientRect();
-      const bossX = bossRect.left + bossRect.width / 2;
-      const bossY = bossRect.top + bossRect.height / 2;
-      
-      for (let i = 0; i < 5; i++) {
-        const minion = document.createElement('div');
-        minion.className = 'bossProjectile';
-        minion.style.background = '#333';
-        minion.style.width = '30px';
-        minion.style.height = '30px';
-        minion.style.left = `${bossX - 15}px`;
-        minion.style.top = `${bossY - 15}px`;
-        minion.style.borderRadius = '50%';
-        minion.style.boxShadow = '0 0 5px #000';
-        document.body.appendChild(minion);
-        
-        const angle = Math.random() * Math.PI * 2;
-        const distance = 50 + Math.random() * 100;
-        const targetX = bossX + Math.cos(angle) * distance;
-        const targetY = bossY + Math.sin(angle) * distance;
-        
-        let progress = 0;
-        const minionInterval = setInterval(() => {
-          progress += 0.05;
-          const x = bossX + (targetX - bossX) * progress;
-          const y = bossY + (targetY - bossY) * progress;
-          
-          minion.style.left = `${x - 15}px`;
-          minion.style.top = `${y - 15}px`;
-          
-          if (progress >= 1) {
-            clearInterval(minionInterval);
-            setTimeout(() => {
-              minion.remove();
-            }, 5000);
-          }
-        }, 50);
-      }
-      
-      bossAvatarWrapper.classList.add('bossAttacking');
-      setTimeout(() => bossAvatarWrapper.classList.remove('bossAttacking'), 500);
-    }
-    
-    function tentacleWhipAttack() {
-      const bossRect = bossAvatarWrapper.getBoundingClientRect();
-      const bossX = bossRect.left + bossRect.width / 2;
-      const bossY = bossRect.top + bossRect.height / 2;
-      
-      for (let i = 0; i < 3; i++) {
-        const tentacle = document.createElement('div');
-        tentacle.className = 'bossProjectile';
-        tentacle.style.background = 'linear-gradient(to right, #330033, #660066)';
-        tentacle.style.width = '10px';
-        tentacle.style.height = '100px';
-        tentacle.style.left = `${bossX - 5}px`;
-        tentacle.style.top = `${bossY - 50}px`;
-        tentacle.style.transformOrigin = 'center bottom';
-        document.body.appendChild(tentacle);
-        
-        const angle = -Math.PI/4 + (Math.PI/4 * i);
-        let rotation = angle;
-        let growing = true;
-        let length = 100;
-        
-        const tentacleInterval = setInterval(() => {
-          if (growing) {
-            rotation += 0.1;
-            length += 10;
-            tentacle.style.height = `${length}px`;
-            tentacle.style.transform = `rotate(${rotation}rad)`;
-            
-            if (rotation >= angle + Math.PI/4) {
-              growing = false;
-            }
-          } else {
-            rotation -= 0.1;
-            length -= 10;
-            tentacle.style.height = `${length}px`;
-            tentacle.style.transform = `rotate(${rotation}rad)`;
-            
-            if (rotation <= angle - Math.PI/4 || length <= 0) {
-              clearInterval(tentacleInterval);
-              tentacle.remove();
-            }
-          }
-        }, 50);
-      }
-      
-      bossAvatarWrapper.classList.add('bossAttacking');
-      setTimeout(() => bossAvatarWrapper.classList.remove('bossAttacking'), 500);
-    }
-    
-    function mindBlastAttack() {
-      const bossRect = bossAvatarWrapper.getBoundingClientRect();
-      const bossX = bossRect.left + bossRect.width / 2;
-      const bossY = bossRect.top + bossRect.height / 2;
-      
-      // Create mind blast effect
-      const blast = document.createElement('div');
-      blast.className = 'bossProjectile';
-      blast.style.background = 'radial-gradient(circle, #990099, #330033)';
-      blast.style.width = '50px';
-      blast.style.height = '50px';
-      blast.style.left = `${bossX - 25}px`;
-      blast.style.top = `${bossY - 25}px`;
-      blast.style.borderRadius = '50%';
-      blast.style.boxShadow = '0 0 20px #990099';
-      document.body.appendChild(blast);
-      
-      // Animate blast expanding
-      let size = 50;
-      let opacity = 1;
-      const blastInterval = setInterval(() => {
-        size += 30;
-        opacity -= 0.05;
-        blast.style.width = `${size}px`;
-        blast.style.height = `${size}px`;
-        blast.style.left = `${bossX - size/2}px`;
-        blast.style.top = `${bossY - size/2}px`;
-        blast.style.opacity = opacity;
-        
-        if (opacity <= 0) {
-          clearInterval(blastInterval);
-          blast.remove();
-        }
-      }, 50);
-      
-      bossAvatarWrapper.classList.add('bossAttacking');
-      setTimeout(() => bossAvatarWrapper.classList.remove('bossAttacking'), 500);
-    }
-    
-    function hellfireAttack() {
-      const bossRect = bossAvatarWrapper.getBoundingClientRect();
-      const bossX = bossRect.left + bossRect.width / 2;
-      const bossY = bossRect.top + bossRect.height / 2;
-      
-      // Create hellfire projectiles
-      for (let i = 0; i < 5; i++) {
-        const fireball = document.createElement('div');
-        fireball.className = 'bossProjectile';
-        fireball.style.background = 'radial-gradient(circle, #ff0000, #990000)';
-        fireball.style.width = '30px';
-        fireball.style.height = '30px';
-        fireball.style.left = `${bossX - 15}px`;
-        fireball.style.top = `${bossY - 15}px`;
-        fireball.style.borderRadius = '50%';
-        fireball.style.boxShadow = '0 0 10px #ff0000';
-        document.body.appendChild(fireball);
-        
-        const angle = Math.random() * Math.PI * 2;
-        const distance = 100 + Math.random() * 100;
-        const targetX = bossX + Math.cos(angle) * distance;
-        const targetY = bossY + Math.sin(angle) * distance;
-        
-        let progress = 0;
-        const fireInterval = setInterval(() => {
-          progress += 0.05;
-          const x = bossX + (targetX - bossX) * progress;
-          const y = bossY + (targetY - bossY) * progress;
-          
-          fireball.style.left = `${x - 15}px`;
-          fireball.style.top = `${y - 15}px`;
-          fireball.style.opacity = 1 - progress;
-          
-          if (progress >= 1) {
-            clearInterval(fireInterval);
-            fireball.remove();
-            
-            // Create explosion
-            const explosion = document.createElement('div');
-            explosion.className = 'bossProjectile';
-            explosion.style.background = 'radial-gradient(circle, #ff6600, #ff0000)';
-            explosion.style.width = '60px';
-            explosion.style.height = '60px';
-            explosion.style.left = `${targetX - 30}px`;
-            explosion.style.top = `${targetY - 30}px`;
-            explosion.style.borderRadius = '50%';
-            explosion.style.boxShadow = '0 0 20px #ff6600';
-            document.body.appendChild(explosion);
-            
-            let explosionSize = 60;
-            let explosionOpacity = 1;
-            const explosionInterval = setInterval(() => {
-              explosionSize += 10;
-              explosionOpacity -= 0.1;
-              explosion.style.width = `${explosionSize}px`;
-              explosion.style.height = `${explosionSize}px`;
-              explosion.style.left = `${targetX - explosionSize/2}px`;
-              explosion.style.top = `${targetY - explosionSize/2}px`;
-              explosion.style.opacity = explosionOpacity;
-              
-              if (explosionOpacity <= 0) {
-                clearInterval(explosionInterval);
-                explosion.remove();
-              }
-            }, 50);
-          }
-        }, 50);
-      }
-      
-      bossAvatarWrapper.classList.add('bossAttacking');
-      setTimeout(() => bossAvatarWrapper.classList.remove('bossAttacking'), 500);
-    }
-    
-    function soulCrushAttack() {
-      const bossRect = bossAvatarWrapper.getBoundingClientRect();
-      const bossX = bossRect.left + bossRect.width / 2;
-      const bossY = bossRect.top + bossRect.height / 2;
-      
-      // Create soul crush effect
-      const crush = document.createElement('div');
-      crush.className = 'bossProjectile';
-      crush.style.background = 'radial-gradient(circle, #0000ff, #000033)';
-      crush.style.width = '200px';
-      crush.style.height = '200px';
-      crush.style.left = `${bossX - 100}px`;
-      crush.style.top = `${bossY - 100}px`;
-      crush.style.borderRadius = '50%';
-      crush.style.boxShadow = '0 0 30px #0000ff';
-      document.body.appendChild(crush);
-      
-      // Animate crush
-      let size = 200;
-      let opacity = 1;
-      const crushInterval = setInterval(() => {
-        size -= 10;
-        opacity -= 0.05;
-        crush.style.width = `${size}px`;
-        crush.style.height = `${size}px`;
-        crush.style.left = `${bossX - size/2}px`;
-        crush.style.top = `${bossY - size/2}px`;
-        crush.style.opacity = opacity;
-        
-        if (opacity <= 0) {
-          clearInterval(crushInterval);
-          crush.remove();
-        }
-      }, 50);
-      
-      bossAvatarWrapper.classList.add('bossAttacking');
-      setTimeout(() => bossAvatarWrapper.classList.remove('bossAttacking'), 500);
-    }
-    
-    function venomBiteAttack() {
-      const bossRect = bossAvatarWrapper.getBoundingClientRect();
-      const bossX = bossRect.left + bossRect.width / 2;
-      const bossY = bossRect.top + bossRect.height / 2;
-      
-      // Create venom droplets
-      for (let i = 0; i < 3; i++) {
-        const venom = document.createElement('div');
-        venom.className = 'bossProjectile';
-        venom.style.background = 'radial-gradient(circle, #00ff00, #003300)';
-        venom.style.width = '15px';
-        venom.style.height = '15px';
-        venom.style.left = `${bossX - 7}px`;
-        venom.style.top = `${bossY - 7}px`;
-        venom.style.borderRadius = '50%';
-        venom.style.boxShadow = '0 0 5px #00ff00';
-        document.body.appendChild(venom);
-        
-        const angle = Math.random() * Math.PI * 2;
-        const distance = 50 + Math.random() * 50;
-        const targetX = bossX + Math.cos(angle) * distance;
-        const targetY = bossY + Math.sin(angle) * distance;
-        
-        let progress = 0;
-        const venomInterval = setInterval(() => {
-          progress += 0.05;
-          const x = bossX + (targetX - bossX) * progress;
-          const y = bossY + (targetY - bossY) * progress + (Math.sin(progress * Math.PI) * -50);
-          
-          venom.style.left = `${x - 7}px`;
-          venom.style.top = `${y - 7}px`;
-          
-          if (progress >= 1) {
-            clearInterval(venomInterval);
-            venom.remove();
-          }
-        }, 50);
-      }
-      
-      bossAvatarWrapper.classList.add('bossAttacking');
-      setTimeout(() => bossAvatarWrapper.classList.remove('bossAttacking'), 500);
-    }
-    
-    function webTrapAttack() {
-      const bossRect = bossAvatarWrapper.getBoundingClientRect();
-      const bossX = bossRect.left + bossRect.width / 2;
-      const bossY = bossRect.top + bossRect.height / 2;
-      
-      // Create web projectiles
-      for (let i = 0; i < 3; i++) {
-        const web = document.createElement('div');
-        web.className = 'bossProjectile';
-        web.style.background = 'radial-gradient(circle, #ffffff, #cccccc)';
-        web.style.width = '30px';
-        web.style.height = '30px';
-        web.style.left = `${bossX - 15}px`;
-        web.style.top = `${bossY - 15}px`;
-        web.style.borderRadius = '50%';
-        web.style.boxShadow = '0 0 5px #ffffff';
-        document.body.appendChild(web);
-        
-        const angle = Math.random() * Math.PI * 2;
-        const distance = 100 + Math.random() * 50;
-        const targetX = bossX + Math.cos(angle) * distance;
-        const targetY = bossY + Math.sin(angle) * distance;
-        
-        let progress = 0;
-        const webInterval = setInterval(() => {
-          progress += 0.05;
-          const x = bossX + (targetX - bossX) * progress;
-          const y = bossY + (targetY - bossY) * progress;
-          
-          web.style.left = `${x - 15}px`;
-          web.style.top = `${y - 15}px`;
-          
-          if (progress >= 1) {
-            clearInterval(webInterval);
-            web.remove();
-            
-            // Create web trap
-            const trap = document.createElement('div');
-            trap.className = 'bossProjectile';
-            trap.style.background = 'radial-gradient(circle, rgba(255,255,255,0.5), rgba(255,255,255,0))';
-            trap.style.width = '80px';
-            trap.style.height = '80px';
-            trap.style.left = `${targetX - 40}px`;
-            trap.style.top = `${targetY - 40}px`;
-            trap.style.borderRadius = '50%';
-            trap.style.boxShadow = '0 0 10px #ffffff';
-            document.body.appendChild(trap);
-            
-            setTimeout(() => {
-              trap.remove();
-            }, 3000);
-          }
-        }, 50);
-      }
-      
-      bossAvatarWrapper.classList.add('bossAttacking');
-      setTimeout(() => bossAvatarWrapper.classList.remove('bossAttacking'), 500);
-    }
-    
-    // ======================
-    // BOSS AI AND ATTACKS
-    // ======================
-    
-    function startBossAttacks() {
-      if (bossAttackTimer) {
-        clearInterval(bossAttackTimer);
-      }
-      
-      // Base cooldown between attacks
-      let cooldown = 5000;
-      
-      // Adjust cooldown based on phase
-      if (currentPhase >= 2) {
-        cooldown *= 0.7; // 30% faster in phase 2
-      }
-      if (currentPhase >= 3) {
-        cooldown *= 0.7; // Another 30% faster in phase 3 (total 51% faster)
-      }
-      
-      bossAttackTimer = setInterval(() => {
-        if (bossHealth <= 0) return;
-        
-        // Choose a random attack pattern
-        const attackIndex = Math.floor(Math.random() * currentBoss.attackPatterns.length);
-        const attack = currentBoss.attackPatterns[attackIndex];
-        
-        // Execute the attack
-        const result = attack.execute();
-        
-        // Apply damage to players
-        const highLevelPlayers = Object.entries(ranking)
-          .filter(([_, stats]) => stats.level >= 3)
-          .map(([user]) => user);
-        
-        if (highLevelPlayers.length > 0) {
-          const damagePerPlayer = Math.floor(result.damage / highLevelPlayers.length);
-          
-          highLevelPlayers.forEach(user => {
-            // Apply damage reduction based on equipment and stats
-            const player = ranking[user];
-            const damageReduction = (player.stats.vit * 0.5) + (player.equipment?.armor?.stats?.armor || 0);
-            const finalDamage = Math.max(1, damagePerPlayer - damageReduction);
-            
-            player.damageTaken = (player.damageTaken || 0) + finalDamage;
-            addChatMessage(`💢 ${currentBoss.name} hits ${user} with ${attack.name} for ${finalDamage} damage!`);
-            
-            // Apply status effects
-            if (result.effects && result.effects.length > 0) {
-              result.effects.forEach(effect => {
-                if (!player.effects) player.effects = [];
-                player.effects.push({ 
-                  type: effect.type, 
-                  duration: effect.duration,
-                  startTime: Date.now()
-                });
-                addChatMessage(`⚠️ ${user} is affected by ${effect.type}!`);
-              });
-            }
-          });
-        }
-        
-        // Show phase change if health threshold crossed
-        checkBossPhase();
-        
-      }, cooldown);
-    }
-    
-    function checkBossPhase() {
-      const healthPercent = bossHealth / maxHealth;
-      const phases = currentBoss.phases;
-      
-      for (let i = 0; i < phases.length; i++) {
-        const phase = phases[i];
-        if (healthPercent <= phase.threshold && currentPhase === i + 1) {
-          currentPhase++;
-          bossPhaseIndicator.textContent = phase.name;
-          bossPhaseIndicator.classList.add('phaseVisible');
-          addChatMessage(`🚨 ${phase.name}: ${phase.effect}`);
-          
-          setTimeout(() => {
-            bossPhaseIndicator.classList.remove('phaseVisible');
-          }, 3000);
-          
-          // Restart attacks with new timing
-          startBossAttacks();
-          break;
-        }
-      }
-    }
-    
-    // ======================
-    // ITEM SYSTEM
-    // ======================
-    
-    function generateRandomItem(playerLevel) {
-      // Determine item rarity
-      let rarityRoll = Math.random();
-      let rarity;
-      
-      if (rarityRoll < 0.6) {
-        rarity = "common";
-      } else if (rarityRoll < 0.85) {
-        rarity = "uncommon";
-      } else if (rarityRoll < 0.95) {
-        rarity = "rare";
-      } else if (rarityRoll < 0.99) {
-        rarity = "epic";
-      } else {
-        rarity = "legendary";
-      }
-      
-      // Determine item type
-      const itemTypeKeys = Object.keys(itemTypes);
-      const itemType = itemTypeKeys[Math.floor(Math.random() * itemTypeKeys.length)];
-      
-      // Determine slot
-      const slots = itemTypes[itemType].slots;
-      const slot = slots[Math.floor(Math.random() * slots.length)];
-      
-      // Generate name
-      const prefixes = itemTypes[itemType].prefixes;
-      const suffixes = itemTypes[itemType].suffixes;
-      const prefix = prefixes[Math.floor(Math.random() * prefixes.length)];
-      const suffix = suffixes[Math.floor(Math.random() * suffixes.length)];
-      const name = `${prefix} ${itemTypes[itemType].name} ${suffix}`;
-      
-      // Generate stats
-      const possibleStats = itemTypes[itemType].stats;
-      const statCount = Math.min(2 + Math.floor(Math.random() * 2), possibleStats.length);
-      
-      const stats = {};
-      const selectedStats = [...possibleStats].sort(() => 0.5 - Math.random()).slice(0, statCount);
-      
-      selectedStats.forEach(stat => {
-        // Base value based on player level and rarity
-        const baseValue = Math.floor((playerLevel * 2) * itemRarities[rarity].multiplier);
-        // Add some random variance
-        stats[stat] = baseValue + Math.floor(Math.random() * (playerLevel + 1));
-      });
-      
-      return {
-        name,
-        type: itemType,
-        slot,
-        rarity,
-        stats,
-        icon: `${itemType}-${slot}` // This would be replaced with actual icon paths
-      };
-    }
-    
-    function awardLoot(username) {
-      const player = ranking[username];
-      if (!player || player.level < 1) return;
-      
-      // Chance to get loot based on player level and boss level
-      const lootChance = 0.3 + (player.level * 0.02) + (bossLevel * 0.01);
-      
-      if (Math.random() < lootChance) {
-        const item = generateRandomItem(player.level);
-        
-        if (!playerInventories[username]) {
-          playerInventories[username] = [];
-        }
-        
-        playerInventories[username].push(item);
-        addChatMessage(`🎁 ${username} found ${item.name}! (${itemRarities[item.rarity].name})`, false, false, item.rarity);
-        
-        // Update inventory display if open
-        if (inventoryPanel.style.display === 'block' && testUsernameInput.value === username) {
-          displayInventory(username);
-        }
-      }
-    }
-    
-    function equipItem(username, itemIndex) {
-      const player = ranking[username];
-      if (!player || !playerInventories[username] || itemIndex >= playerInventories[username].length) return;
-      
-      const item = playerInventories[username][itemIndex];
-      
-      // Initialize equipment if needed
-      if (!playerEquipment[username]) {
-        playerEquipment[username] = {};
-      }
-      
-      // Check if slot is occupied
-      const currentItem = playerEquipment[username][item.slot];
-      
-      // Swap items
-      playerEquipment[username][item.slot] = item;
-      playerInventories[username].splice(itemIndex, 1);
-      
-      if (currentItem) {
-        playerInventories[username].push(currentItem);
-      }
-      
-      // Update player stats
-      updatePlayerStats(username);
-      
-      // Update inventory display
-      displayInventory(username);
-      
-      addChatMessage(`⚔️ ${username} equipped ${item.name}!`);
-    }
-    
-    function unequipItem(username, slot) {
-      const player = ranking[username];
-      if (!player || !playerEquipment[username] || !playerEquipment[username][slot]) return;
-      
-      const item = playerEquipment[username][slot];
-      
-      if (!playerInventories[username]) {
-        playerInventories[username] = [];
-      }
-      
-      playerInventories[username].push(item);
-      delete playerEquipment[username][slot];
-      
-      // Update player stats
-      updatePlayerStats(username);
-      
-      // Update inventory display
-      displayInventory(username);
-      
-      addChatMessage(`📦 ${username} unequipped ${item.name}.`);
-    }
-    
-    function updatePlayerStats(username) {
-      const player = ranking[username];
-      if (!player) return;
-      
-      // Reset to base stats
-      player.stats = { ...playerClasses[player.class].stats };
-      
-      // Apply equipment bonuses
-      if (playerEquipment[username]) {
-        Object.values(playerEquipment[username]).forEach(item => {
-          Object.entries(item.stats).forEach(([stat, value]) => {
-            player.stats[stat] = (player.stats[stat] || 0) + value;
-          });
-        });
-      }
-      
-      // Update scoreboard to reflect new stats
-      updateScoreboard();
-    }
-    
-    // ======================
-    // INVENTORY UI
-    // ======================
-    
-    function displayInventory(username) {
-      const player = ranking[username];
-      if (!player) return;
-      
-      // Clear current display
-      equippedItems.innerHTML = '';
-      inventoryGrid.innerHTML = '';
-      
-      // Display equipped items
-      const equippedSlots = ['mainHand', 'offHand', 'head', 'chest', 'legs', 'feet', 'ring', 'amulet', 'trinket'];
-      
-      equippedSlots.forEach(slot => {
-        const slotDiv = document.createElement('div');
-        slotDiv.className = 'inventory-item';
-        slotDiv.innerHTML = `
-          <div>${slot.toUpperCase()}</div>
-          ${playerEquipment[username] && playerEquipment[username][slot] ? 
-            `<div class="item-rarity-${playerEquipment[username][slot].rarity}">
-              ${playerEquipment[username][slot].name}
-              <button onclick="unequipItem('${username}', '${slot}')">Unequip</button>
-            </div>` : 
-            '<div>Empty</div>'}
-        `;
-        equippedItems.appendChild(slotDiv);
-      });
-      
-      // Display inventory items
-      if (playerInventories[username]) {
-        playerInventories[username].forEach((item, index) => {
-          const itemDiv = document.createElement('div');
-          itemDiv.className = 'inventory-item';
-          itemDiv.innerHTML = `
-            <div class="item-rarity-${item.rarity}">
-              ${item.name}
-              <button onclick="equipItem('${username}', ${index})">Equip</button>
-            </div>
-          `;
-          inventoryGrid.appendChild(itemDiv);
-        });
-      }
-      
-      // Show the inventory panel
-      inventoryPanel.style.display = 'block';
+      bossCanvas.style.boxShadow = bossShieldActive ? "0 0 15px #00f" : "none";
     }
     
     // ======================
     // UTILITY FUNCTIONS
     // ======================
     
-    // Add a chat message with fade-in effect
-    function addChatMessage(message, isCritical = false, isMiss = false, rarity = null) {
+    function addChatMessage(message, isCritical = false, isMiss = false) {
       const messageEl = document.createElement('div');
       messageEl.textContent = message;
-      
-      if (isCritical) {
-        messageEl.classList.add('criticalHit');
-      } else if (isMiss) {
-        messageEl.classList.add('miss');
-      } else if (rarity) {
-        messageEl.style.color = itemRarities[rarity].color;
-      }
-      
+      if (isCritical) messageEl.classList.add('criticalHit');
+      if (isMiss) messageEl.classList.add('miss');
       chatLog.appendChild(messageEl);
       chatLog.scrollTop = chatLog.scrollHeight;
     }
     
-    // Update boss health display
     function updateBossHealth() {
       if (bossHealth < 0) bossHealth = 0;
       bossHealthText.textContent = `${bossHealth} / ${maxHealth}`;
       const percent = (bossHealth / maxHealth) * 100;
       bossHealthFill.style.width = percent + "%";
-      
-      // Check for phase transitions
-      checkBossPhase();
+      // Trigger transformation if boss drops below 50% and is still phase 1
+      if (bossPhase === 1 && bossHealth < maxHealth * 0.5) {
+        transformBoss();
+      }
+      if (bossHealth < maxHealth * 0.3 && !isBossEnraged) {
+        isBossEnraged = true;
+        bossAvatarWrapper.classList.add('bossRage');
+        addChatMessage(`💢 ${currentBoss.name} ENRAGES as its health drops! Attacks are stronger!`);
+      } else if (bossHealth >= maxHealth * 0.3 && isBossEnraged) {
+        isBossEnraged = false;
+        bossAvatarWrapper.classList.remove('bossRage');
+      }
     }
     
-    // Update scoreboard display
+    // Update scoreboard (including combo count)
     function updateScoreboard() {
       const scores = Object.entries(ranking)
+        .filter(([user]) => user !== "Streamer")
         .sort((a, b) => {
-          if (b[1].bossesKilled === a[1].bossesKilled) {
-            return b[1].damage - a[1].damage;
-          }
+          if (b[1].bossesKilled === a[1].bossesKilled) return b[1].damage - a[1].damage;
           return b[1].bossesKilled - a[1].bossesKilled;
         });
       
       let html = scores.map(([user, stats]) => {
-        let levelUpText = stats.levelUp ? `<span class="levelUp">LEVEL UP!</span>` : "";
-        let classText = stats.class ? `<span class="${stats.class}">${playerClasses[stats.class].name}</span>` : "Adventurer";
-        
-        // Display equipped weapon if available
-        let weaponText = "";
-        if (playerEquipment[user] && playerEquipment[user].mainHand) {
-          weaponText = `<br><small>Weapon: ${playerEquipment[user].mainHand.name}</small>`;
-        }
-        
-        // Display status effects if any
-        let effectsText = "";
-        if (stats.effects && stats.effects.length > 0) {
-          effectsText = "<br>";
-          stats.effects.forEach(effect => {
-            effectsText += `<span class="status-effect status-${effect.type}" title="${effect.type}"></span>`;
-          });
-        }
-        
-        return `
-          <div>
-            <strong>${user}</strong> (${classText}): ${stats.bossesKilled} boss kills, ${stats.damage} dmg, Level ${stats.level} ${levelUpText}${effectsText}<br>
-            <small>XP: ${stats.xp}/${stats.level * 100}</small>${weaponText}
-          </div>`;
+        const levelUpText = stats.levelUp ? `<span class="levelUp">LEVEL UP!</span>` : "";
+        const comboText = stats.combo > 1 ? ` | Combo: ${stats.combo}` : "";
+        const hpDisplay = stats.hp > 0 ? `HP: ${stats.hp}/${stats.maxHp}` : `<span style="color:#f00;">DEAD</span>`;
+        return `<div>
+                  <strong>${user}</strong>: ${stats.bossesKilled} boss kills, ${stats.damage} dmg, Level ${stats.level} ${levelUpText}${comboText}<br>
+                  <small>XP: ${stats.xp}/${stats.level * 100} | ${hpDisplay}</small>
+                </div>`;
       }).join("");
-      
       scoreboardContent.innerHTML = html || "No players yet.";
-      
-      // Show/hide special attack button based on player levels
-      const hasHighLevelPlayer = Object.values(ranking).some(player => player.level >= 5);
-      specialAttackBtn.style.display = hasHighLevelPlayer ? 'block' : 'none';
     }
     
-    // Show a quick blood flash overlay
     function showBloodFlash() {
       bloodFlash.classList.add('bloodVisible');
-      setTimeout(() => {
-        bloodFlash.classList.remove('bloodVisible');
-      }, 200);
+      setTimeout(() => { bloodFlash.classList.remove('bloodVisible'); }, 200);
     }
     
-    // Boss flicker and shake effect when hurt
     function bossFlicker() {
       bossAvatarWrapper.classList.add('hurt');
       const dx = Math.floor(Math.random() * 21) - 10;
@@ -2803,440 +805,390 @@
       }, 300);
     }
     
-    // Check if a player can level up
     function checkLevelUp(username) {
       const player = ranking[username];
-      if (!player) return;
-      
       let threshold = player.level * 100;
       let leveledUp = false;
-      
       while (player.xp >= threshold) {
         player.xp -= threshold;
         player.level++;
         leveledUp = true;
         threshold = player.level * 100;
-        
-        // Award a random item on level up
-        if (player.level % 3 === 0) {
-          awardLoot(username);
-        }
       }
-      
       if (leveledUp) {
         player.levelUp = true;
         updateScoreboard();
         addChatMessage(`🎉 ${username} leveled up to level ${player.level}!`);
-        
-        // Remove the announcement flag after 3 seconds
-        setTimeout(() => {
-          player.levelUp = false;
-          updateScoreboard();
-        }, 3000);
+        setTimeout(() => { player.levelUp = false; updateScoreboard(); }, 3000);
       }
     }
     
-    // Attack cooldown
-    function startAttackCooldown(btn, cooldownFill, duration) {
-      btn.disabled = true;
-      let cooldown = 100;
-      
-      const cooldownInterval = setInterval(() => {
-        cooldown--;
-        cooldownFill.style.width = cooldown + '%';
-        
-        if (cooldown <= 0) {
-          clearInterval(cooldownInterval);
-          btn.disabled = false;
-          cooldownFill.style.width = '100%';
-        }
-      }, duration / 100);
+    // New: Boss transformation phase
+    function transformBoss() {
+      bossPhase = 2;
+      addChatMessage(`🔥 ${currentBoss.name} transforms into its enraged form! Its attacks become even more ferocious!`);
+      bossCanvas.style.filter = "drop-shadow(0 0 20px #f00) brightness(1.2) contrast(1.4)";
     }
     
-    // Special attack cooldown
+    // New: Environmental hazard event (triggers randomly every 30 seconds)
+    function triggerEnvironmentalHazard() {
+      // 50% chance to damage players or heal boss
+      if (Math.random() < 0.5) {
+        addChatMessage("🌪️ An earthquake shakes the arena! All players take 10 damage.");
+        for (const user in ranking) {
+          if (user !== "Streamer") {
+            ranking[user].hp -= 10;
+            if (ranking[user].hp < 0) ranking[user].hp = 0;
+          }
+        }
+      } else {
+        const heal = 50;
+        bossHealth += heal;
+        if (bossHealth > maxHealth) bossHealth = maxHealth;
+        addChatMessage(`🌧️ A sudden rain of healing waters restores ${heal} health to ${currentBoss.name}!`);
+        updateBossHealth();
+      }
+      updateScoreboard();
+    }
+    
+    // Set an interval for environmental hazards (every 30 seconds, 10% chance)
+    setInterval(() => {
+      if (Math.random() < 0.1) {
+        triggerEnvironmentalHazard();
+      }
+    }, 30000);
+    
+    // Special attack (triggered by "10")
+    function performSpecialAttack(username) {
+      if (isSpecialAttackOnCooldown) return;
+      const player = ranking[username];
+      if (!player || player.level < 5) {
+        addChatMessage(`⚠️ ${username}, you need to be level 5+ to use special attacks`);
+        return;
+      }
+      let damage = Math.floor(50 + Math.random() * 50);
+      damage = Math.floor(damage * (1 + ((player.combo - 1) * 0.1)));
+      const isWeakness = Math.random() < 0.3;
+      const effectiveDamage = isWeakness ? Math.floor(damage * 1.5) : damage;
+      if (bossShieldActive) {
+        addChatMessage(`🛡️ ${username} tried a special attack, but ${currentBoss.name}'s shield absorbed it!`);
+      } else {
+        if (isWeakness) {
+          addChatMessage(`🌟 ${username} unleashes a ${currentBoss.specialWeakness.toUpperCase()} special attack, exploiting ${currentBoss.name}'s weakness for ${effectiveDamage} damage!`, true);
+        } else {
+          addChatMessage(`✨ ${username} performs a special attack dealing ${effectiveDamage} damage!`);
+        }
+        bossHealth -= effectiveDamage;
+        player.damage += effectiveDamage;
+        player.xp += effectiveDamage;
+        checkLevelUp(username);
+        updateBossHealth();
+        showBloodFlash();
+        bossFlicker();
+        updateScoreboard();
+        if (bossHealth <= 0) {
+          addChatMessage(`💀 ${username} defeated ${currentBoss.name} with a powerful special attack!`);
+          bossAvatarWrapper.classList.add('bossDeath');
+          setTimeout(() => {
+            spawnNewBoss(username);
+            bossAvatarWrapper.classList.remove('bossDeath');
+          }, 800);
+        }
+      }
+      startSpecialAttackCooldown();
+    }
+    
     function startSpecialAttackCooldown() {
-      specialAttackCooldown = true;
-      specialAttackBtn.disabled = true;
+      isSpecialAttackOnCooldown = true;
       let cooldown = 100;
-      
       const cooldownInterval = setInterval(() => {
         cooldown--;
-        specialAttackCooldownFill.style.width = cooldown + '%';
-        
         if (cooldown <= 0) {
           clearInterval(cooldownInterval);
-          specialAttackCooldown = false;
-          specialAttackBtn.disabled = false;
-          specialAttackCooldownFill.style.width = '100%';
+          isSpecialAttackOnCooldown = false;
         }
       }, 50);
     }
     
-    // ======================
-    // BOSS MODE FUNCTIONS
-    // ======================
+    function updateCreditsDisplay() {
+      creditsCount.textContent = tiktokCredits;
+    }
     
-    // Spawn a new, harder boss with a random creature
+    function addTikTokCredits(amount) {
+      tiktokCredits += amount;
+      updateCreditsDisplay();
+      addChatMessage(`🎁 Received ${amount} TikTok credits! Current total: ${tiktokCredits}`);
+    }
+    
     function spawnNewBoss(killer) {
       bossLevel++;
-      currentPhase = 1;
-      
-      // Select a random boss from our list
+      isBossEnraged = false;
+      bossShieldActive = false;
+      bossPhase = 1;
+      bossAvatarWrapper.classList.remove('bossRage');
       const bossIndex = Math.floor(Math.random() * bossTypes.length);
       currentBoss = bossTypes[bossIndex];
       maxHealth = Math.floor(baseHealth * currentBoss.healthMultiplier) + (bossLevel - 1) * 500;
       bossHealth = maxHealth;
       updateBossHealth();
-    
-      // Generate new pixel boss
       generatePixelBoss(currentBoss);
       bossAvatarWrapper.classList.add('bossEntrance');
       setTimeout(() => bossAvatarWrapper.classList.remove('bossEntrance'), 800);
-    
       addChatMessage(`🔥 ${currentBoss.description}`);
       addChatMessage(`💀 A new boss: ${currentBoss.name} (Level ${bossLevel}) has appeared!`);
-    
-      if (!ranking[killer]) {
-        ranking[killer] = { 
-          damage: 0, 
-          bossesKilled: 0, 
-          xp: 0, 
-          level: 1, 
-          levelUp: false,
-          class: Object.keys(playerClasses)[Math.floor(Math.random() * Object.keys(playerClasses).length)]
-        };
+      if (killer && !ranking[killer]) {
+        ranking[killer] = { damage: 0, bossesKilled: 0, xp: 0, level: 1, levelUp: false, hp: 100, maxHp: 100, combo: 0 };
       }
-      
-      ranking[killer].bossesKilled++;
+      if (killer) ranking[killer].bossesKilled++;
       updateScoreboard();
-      
-      // Start boss attacks
-      startBossAttacks();
-      
-      // Award loot to killer
-      awardLoot(killer);
     }
     
-    // Special attack from high-level players
-    function performSpecialAttack(username) {
-      if (specialAttackCooldown) return;
-      
-      const highLevelPlayers = Object.entries(ranking)
-        .filter(([_, stats]) => stats.level >= 5)
-        .map(([user]) => user);
-      
-      if (highLevelPlayers.length === 0) return;
-      
-      // Calculate damage based on number of high-level players
-      const baseDamage = 50 + (highLevelPlayers.length * 20) + Math.floor(Math.random() * 51);
-      
-      // Check if attack exploits boss weakness
-      const isWeakness = Math.random() < 0.3; // 30% chance to exploit weakness
-      let damage = isWeakness ? Math.floor(baseDamage * 1.5) : baseDamage;
-      
-      // Apply player stat bonuses
-      highLevelPlayers.forEach(user => {
-        const player = ranking[user];
-        if (player.stats.str) damage += Math.floor(player.stats.str * 0.5);
-        if (player.stats.int) damage += Math.floor(player.stats.int * 0.5);
-      });
-      
-      if (isWeakness) {
-        addChatMessage(`🌟 ${highLevelPlayers.join(', ')} unleash a ${currentBoss.specialWeakness.toUpperCase()} attack, exploiting ${currentBoss.name}'s weakness for ${damage} damage!`, true);
+    function bossCounterAttack(username) {
+      const missChance = 0.3;
+      if (Math.random() < missChance) {
+        addChatMessage(`👾 ${currentBoss.name} counterattacks ${username} but misses!`, false, true);
       } else {
-        addChatMessage(`✨ ${highLevelPlayers.join(', ')} combine their power for a special attack dealing ${damage} damage!`);
-      }
-      
-      bossHealth -= damage;
-      
-      // Award XP to all participants
-      highLevelPlayers.forEach(user => {
-        ranking[user].damage += Math.floor(damage / highLevelPlayers.length);
-        ranking[user].xp += Math.floor(damage / highLevelPlayers.length);
-        checkLevelUp(user);
-      });
-      
-      updateBossHealth();
-      showBloodFlash();
-      bossFlicker();
-      updateScoreboard();
-      
-      // Start cooldown
-      startSpecialAttackCooldown();
-      
-      if (bossHealth <= 0) {
-        addChatMessage(`💀 ${highLevelPlayers.join(', ')} defeated ${currentBoss.name} with a powerful special attack!`);
-        bossAvatarWrapper.classList.add('bossDeath');
-        
-        // Award loot to all participants
-        highLevelPlayers.forEach(user => {
-          awardLoot(user);
-        });
-        
-        setTimeout(() => {
-          spawnNewBoss(highLevelPlayers[0]);
-          bossAvatarWrapper.classList.remove('bossDeath');
-        }, 800);
-      }
-    }
-    
-    // Process player attack
-    function performAttack(username) {
-      if (!joinedPlayers.has(username)) {
-        addChatMessage(`⚠️ ${username}, please join first by typing !join`);
-        return;
-      }
-      
-      const player = ranking[username];
-      
-      // Calculate base damage with critical chance
-      const isCritical = Math.random() < (0.15 + (player.stats.dex ? player.stats.dex * 0.005 : 0));
-      let damage = Math.floor(Math.random() * 41) + 10;
-      
-      // Apply player stat bonuses
-      if (player.stats.str) damage += Math.floor(player.stats.str * 0.8);
-      if (player.stats.dex) damage += Math.floor(player.stats.dex * 0.5);
-      
-      // Apply weapon bonus if equipped
-      if (playerEquipment[username] && playerEquipment[username].mainHand) {
-        const weapon = playerEquipment[username].mainHand;
-        damage += weapon.stats.str ? Math.floor(weapon.stats.str * 1.2) : 0;
-        damage += weapon.stats.dex ? Math.floor(weapon.stats.dex * 0.8) : 0;
-      }
-      
-      if (isCritical) {
-        damage = Math.floor(damage * 1.5);
-        addChatMessage(`💥 CRITICAL HIT! ${username} attacks ${currentBoss.name} for ${damage} damage!`, true);
-      } else {
-        addChatMessage(`⚔️ ${username} attacks ${currentBoss.name} for ${damage} damage!`);
-      }
-      
-      bossHealth -= damage;
-      player.damage += damage;
-      player.xp += damage;
-      checkLevelUp(username);
-      updateBossHealth();
-      showBloodFlash();
-      bossFlicker();
-      updateScoreboard();
-      
-      if (bossHealth <= 0) {
-        addChatMessage(`💀 ${username} dealt the final blow to ${currentBoss.name}!`);
-        bossAvatarWrapper.classList.add('bossDeath');
-        
-        // Award loot to killer
-        awardLoot(username);
-        
-        setTimeout(() => {
-          spawnNewBoss(username);
-          bossAvatarWrapper.classList.remove('bossDeath');
-        }, 800);
-      }
-    }
-    
-    // Process player ability
-    function performAbility(username, abilityIndex) {
-      if (!joinedPlayers.has(username)) {
-        addChatMessage(`⚠️ ${username}, please join first by typing !join`);
-        return;
-      }
-      
-      const player = ranking[username];
-      if (!player || !player.class || !playerClasses[player.class].abilities[abilityIndex]) return;
-      
-      const ability = playerClasses[player.class].abilities[abilityIndex];
-      const result = ability.execute(player);
-      
-      if (result.damage) {
-        // Apply player stat bonuses to damage
-        let damage = result.damage;
-        if (player.stats.str) damage += Math.floor(player.stats.str * 0.5);
-        if (player.stats.int) damage += Math.floor(player.stats.int * 0.8);
-        
-        // Apply weapon bonus if equipped
-        if (playerEquipment[username] && playerEquipment[username].mainHand) {
-          const weapon = playerEquipment[username].mainHand;
-          damage += weapon.stats.str ? Math.floor(weapon.stats.str * 0.5) : 0;
-          damage += weapon.stats.int ? Math.floor(weapon.stats.int * 1.0) : 0;
+        const damage = Math.floor(Math.random() * 11) + 5;
+        ranking[username].hp -= damage;
+        if (ranking[username].hp < 0) ranking[username].hp = 0;
+        addChatMessage(`👾 ${currentBoss.name} counterattacks ${username} for ${damage} damage!`);
+        updateScoreboard();
+        if (ranking[username].hp <= 0) {
+          addChatMessage(`💀 ${username} has been defeated by ${currentBoss.name}! Use !revive to try again.`, true);
         }
-        
+      }
+    }
+    
+    // New: Player assist command
+    function performAssistAttack(username) {
+      const player = ranking[username];
+      if (player.combo < 5) {
+        addChatMessage(`⚠️ ${username}, you need a combo of at least 5 to call for an assist!`);
+        return;
+      }
+      const damage = player.combo * 20;
+      addChatMessage(`🚀 ${username} calls in an ASSIST attack, dealing ${damage} bonus damage!`, true);
+      if (!bossShieldActive) {
         bossHealth -= damage;
         player.damage += damage;
         player.xp += damage;
-        
-        addChatMessage(`🔮 ${username} uses ${ability.name} on ${currentBoss.name} for ${damage} damage!`);
-        
-        if (result.effects && result.effects.length > 0) {
-          result.effects.forEach(effect => {
-            bossEffects.push({
-              type: effect.type,
-              duration: effect.duration,
-              startTime: Date.now()
-            });
-            addChatMessage(`⚠️ ${currentBoss.name} is affected by ${effect.type}!`);
-          });
-        }
-        
-        updateBossHealth();
-        showBloodFlash();
-        bossFlicker();
-      }
-      
-      if (result.heal) {
-        // Apply healing bonuses
-        let heal = result.heal;
-        if (player.stats.int) heal += Math.floor(player.stats.int * 1.0);
-        
-        // Find lowest health player to heal
-        const players = Object.entries(ranking)
-          .filter(([_, p]) => p.damageTaken > 0)
-          .sort((a, b) => a[1].damageTaken - b[1].damageTaken);
-        
-        if (players.length > 0) {
-          const target = players[0][0];
-          const targetPlayer = ranking[target];
-          targetPlayer.damageTaken = Math.max(0, targetPlayer.damageTaken - heal);
-          addChatMessage(`💖 ${username} uses ${ability.name} to heal ${target} for ${heal} health!`);
-        } else {
-          addChatMessage(`💖 ${username} uses ${ability.name} but there's no one to heal!`);
-        }
-      }
-      
-      // Start cooldown
-      if (abilityIndex === 0) {
-        startAttackCooldown(ability1Btn, ability1CooldownFill, ability.cooldown * 1000);
       } else {
-        startAttackCooldown(ability2Btn, ability2CooldownFill, ability.cooldown * 1000);
+        addChatMessage(`🛡️ But the assist was absorbed by ${currentBoss.name}'s shield!`);
       }
-      
+      player.combo = 0;
       checkLevelUp(username);
+      updateBossHealth();
+      showBloodFlash();
+      bossFlicker();
       updateScoreboard();
-      
       if (bossHealth <= 0) {
-        addChatMessage(`💀 ${username} defeated ${currentBoss.name} with ${ability.name}!`);
+        addChatMessage(`💀 ${username} dealt the final blow to ${currentBoss.name}!`);
         bossAvatarWrapper.classList.add('bossDeath');
-        
-        // Award loot to killer
-        awardLoot(username);
-        
         setTimeout(() => {
           spawnNewBoss(username);
           bossAvatarWrapper.classList.remove('bossDeath');
         }, 800);
       }
+      // Boss counterattacks after assist as well.
+      if (bossHealth > 0) bossCounterAttack(username);
     }
     
-    // Process boss mode commands
     function processBossCommand(command, username = "Viewer") {
       command = command.trim();
       if (!command) return;
       
-      if (command.startsWith("!join")) {
-        if (!joinedPlayers.has(username)) {
-          joinedPlayers.add(username);
-          // Randomly choose a player class and initialize stats using the base stats from that class
-          const pClass = Object.keys(playerClasses)[Math.floor(Math.random() * Object.keys(playerClasses).length)];
-          ranking[username] = { 
-            damage: 0, 
-            bossesKilled: 0, 
-            xp: 0, 
-            level: 1, 
-            levelUp: false,
-            class: pClass,
-            stats: { ...playerClasses[pClass].stats }  // Initialize player stats here
-          };
-          addChatMessage(`🔔 ${username} joined the fight as a ${ranking[username].class}!`);
-          updateScoreboard();
-        } else {
-          addChatMessage(`ℹ️ ${username}, you have already joined.`);
-        }
-      } else if (command.startsWith("!attack")) {
-        performAttack(username);
-      } else if (command.startsWith("!special")) {
-        if (!joinedPlayers.has(username)) {
-          addChatMessage(`⚠️ ${username}, please join first by typing !join`);
-          return;
-        }
-        
-        if (ranking[username].level < 5) {
-          addChatMessage(`⚠️ ${username}, you need to be level 5+ to use special attacks`);
-          return;
-        }
-        
-        performSpecialAttack(username);
-      } else if (command.startsWith("!ability1")) {
-        performAbility(username, 0);
-      } else if (command.startsWith("!ability2")) {
-        performAbility(username, 1);
-      } else if (command.startsWith("!heal")) {
-        if (!joinedPlayers.has(username)) {
-          addChatMessage(`⚠️ ${username}, please join first by typing !join`);
-          return;
-        }
-        
-        const heal = Math.floor(Math.random() * 21) + 5;
-        bossHealth += heal;
-        if (bossHealth > maxHealth) bossHealth = maxHealth;
-        addChatMessage(`💖 ${username} heals ${currentBoss.name} for ${heal} health!`);
-        updateBossHealth();
-      } else if (command.startsWith("!stats")) {
-        if (!joinedPlayers.has(username)) {
-          addChatMessage(`⚠️ ${username}, please join first by typing !join`);
-          return;
-        }
-        
-        const stats = ranking[username];
-        let classInfo = "";
-        if (stats.class) {
-          const pClass = playerClasses[stats.class];
-          classInfo = `\nClass: ${pClass.name} - ${pClass.description}`;
-          
-          // Add abilities info
-          classInfo += `\nAbilities:`;
-          pClass.abilities.forEach((ability, index) => {
-            classInfo += `\n${index+1}. ${ability.name}: ${ability.description}`;
-          });
-        }
-        
-        addChatMessage(`📊 ${username} Stats: ${stats.bossesKilled} boss kills, ${stats.damage} dmg, Level ${stats.level} (XP: ${stats.xp}/${stats.level * 100})${classInfo}`);
-      } else if (command.startsWith("!inventory")) {
-        if (!joinedPlayers.has(username)) {
-          addChatMessage(`⚠️ ${username}, please join first by typing !join`);
-          return;
-        }
-        
-        // For testing, we'll use the test username input value
-        displayInventory(testUsernameInput.value || username);
-      } else if (command.startsWith("!class")) {
-        if (!joinedPlayers.has(username)) {
-          addChatMessage(`⚠️ ${username}, please join first by typing !join`);
-          return;
-        }
-        
-        const classArg = command.split(" ")[1];
-        if (classArg && playerClasses[classArg.toLowerCase()]) {
-          ranking[username].class = classArg.toLowerCase();
-          addChatMessage(`🎭 ${username} is now a ${ranking[username].class}!`);
-          updateScoreboard();
-        } else {
-          const classList = Object.keys(playerClasses).join(", ");
-          addChatMessage(`ℹ️ Available classes: ${classList}`);
-        }
-      } else if (command.startsWith("!help")) {
-        addChatMessage(`💡 Available commands: 
-        !join - Join the battle
-        !attack - Attack the boss
-        !special - Special attack (Lvl 5+)
-        !ability1 - Use your first class ability
-        !ability2 - Use your second class ability
-        !heal - Heal the boss (for fun)
-        !stats - Check your stats
-        !inventory - View your inventory
-        !class [name] - Change your class
-        !help - Show this help`);
-      } else {
-        // Ignore unrecognized commands
+      if (!joinedPlayers.has(username)) {
+        joinedPlayers.add(username);
+        ranking[username] = { damage: 0, bossesKilled: 0, xp: 0, level: 1, levelUp: false, hp: 100, maxHp: 100, combo: 0 };
+        if(username !== "Streamer") addChatMessage(`🔔 ${username} joined the fight!`);
+        updateScoreboard();
       }
+      
+      if (command.startsWith("!revive")) {
+        const player = ranking[username];
+        if (player.hp > 0) {
+          addChatMessage(`${username}, you are still alive!`);
+        } else {
+          player.hp = player.maxHp;
+          addChatMessage(`💖 ${username} has been revived!`);
+          updateScoreboard();
+        }
+        return;
+      }
+      
+      if (ranking[username].hp <= 0) {
+        addChatMessage(`${username}, you are dead. Use !revive to come back.`);
+        return;
+      }
+      
+      // New assist command
+      if (command.startsWith("!assist")) {
+        performAssistAttack(username);
+        return;
+      }
+      
+      if (/^(10|[0-9])$/.test(command)) {
+        if (command === "10") {
+          performSpecialAttack(username);
+          if (bossHealth > 0) bossCounterAttack(username);
+          ranking[username].combo = 0;
+          return;
+        }
+        const num = parseInt(command);
+        if (num === 0) {
+          const heal = Math.floor(Math.random() * 21) + 10;
+          bossHealth += heal;
+          if (bossHealth > maxHealth) bossHealth = maxHealth;
+          addChatMessage(`💖 ${username} heals ${currentBoss.name} for ${heal} health!`);
+          updateBossHealth();
+          return;
+        }
+        
+        let hitChance = 1.0 - (num - 1) * 0.05;
+        if (Math.random() > hitChance) {
+          addChatMessage(`⚔️ ${username} attacked with a ${num} attack but missed!`, false, true);
+          ranking[username].combo = 0;
+          if (bossHealth > 0) bossCounterAttack(username);
+          return;
+        }
+        
+        let damageRange;
+        if (num <= 3) {
+          damageRange = { min: 10, max: 30 };
+        } else if (num <= 6) {
+          damageRange = { min: 30, max: 60 };
+        } else {
+          damageRange = { min: 60, max: 90 };
+        }
+        let damage = Math.floor(Math.random() * (damageRange.max - damageRange.min + 1)) + damageRange.min;
+        damage = Math.floor(damage * (1 + (ranking[username].level * 0.05)));
+        damage = Math.floor(damage * (1 + ((ranking[username].combo || 0) * 0.1)));
+        damage = Math.floor(damage * chatPower);
+        const critChance = 0.15 + (ranking[username].level * 0.01);
+        const isCritical = Math.random() < critChance;
+        if (isCritical) {
+          damage = Math.floor(damage * 1.5);
+          addChatMessage(`💥 CRITICAL HIT! ${username} attacks ${currentBoss.name} for ${damage} damage!`, true);
+        } else {
+          addChatMessage(`⚔️ ${username} attacks ${currentBoss.name} for ${damage} damage!`);
+        }
+        
+        if (bossShieldActive) {
+          addChatMessage(`🛡️ ${username}'s attack was absorbed by ${currentBoss.name}'s shield!`);
+        } else {
+          bossHealth -= damage;
+          ranking[username].damage += damage;
+          ranking[username].xp += damage;
+          ranking[username].combo = (ranking[username].combo || 0) + 1;
+          if (ranking[username].combo >= 3) {
+            addChatMessage(`🔥 ${username} is on a streak! (Combo: ${ranking[username].combo})`);
+          }
+        }
+        
+        checkLevelUp(username);
+        updateBossHealth();
+        showBloodFlash();
+        bossFlicker();
+        updateScoreboard();
+        if (bossHealth <= 0) {
+          addChatMessage(`💀 ${username} dealt the final blow to ${currentBoss.name}!`);
+          bossAvatarWrapper.classList.add('bossDeath');
+          setTimeout(() => {
+            spawnNewBoss(username);
+            bossAvatarWrapper.classList.remove('bossDeath');
+          }, 800);
+          return;
+        }
+        if (bossHealth > 0) bossCounterAttack(username);
+        if (!bossShieldActive && bossHealth < maxHealth * 0.7 && Math.random() < 0.2) {
+          activateBossShield();
+        }
+      }
+      else if (command.startsWith("!attack")) {
+        const isCritical = Math.random() < 0.15;
+        let damage = Math.floor(Math.random() * 41) + 10;
+        if (isBossEnraged) damage = Math.floor(damage * 0.8);
+        if (isCritical) {
+          damage = Math.floor(damage * 1.5);
+          addChatMessage(`💥 CRITICAL HIT! ${username} attacks ${currentBoss.name} for ${damage} damage!`, true);
+        } else {
+          addChatMessage(`⚔️ ${username} attacks ${currentBoss.name} for ${damage} damage!`);
+        }
+        if (!bossShieldActive) {
+          bossHealth -= damage;
+          ranking[username].damage += damage;
+          ranking[username].xp += damage;
+        } else {
+          addChatMessage(`🛡️ ${username}'s attack was absorbed by ${currentBoss.name}'s shield!`);
+        }
+        checkLevelUp(username);
+        updateBossHealth();
+        showBloodFlash();
+        bossFlicker();
+        updateScoreboard();
+        if (bossHealth <= 0) {
+          addChatMessage(`💀 ${username} dealt the final blow to ${currentBoss.name}!`);
+          bossAvatarWrapper.classList.add('bossDeath');
+          setTimeout(() => {
+            spawnNewBoss(username);
+            bossAvatarWrapper.classList.remove('bossDeath');
+          }, 800);
+        }
+      }
+      else if (command.startsWith("!stats")) {
+        const stats = ranking[username];
+        addChatMessage(`📊 ${username} Stats: ${stats.bossesKilled} boss kills, ${stats.damage} dmg, Level ${stats.level} (XP: ${stats.xp}/${stats.level * 100}) | HP: ${stats.hp}/${stats.maxHp} | Combo: ${stats.combo || 0}`);
+      }
+      else if (command.startsWith("!help")) {
+        addChatMessage(`💡 Type numbers 1-9 to attack (higher numbers = stronger but lower hit chance), 0 to heal, 10 for a special attack (Lvl 5+), and !assist (if combo ≥ 5). Use !revive if you are defeated!`);
+      }
+    }
+    
+    // ======================
+    // STREAMER FUNCTIONS
+    // ======================
+    
+    function streamerSpawnBoss() {
+      if (bossHealth > 0) {
+        addChatMessage(`💀 The streamer has forced ${currentBoss.name} to retreat!`);
+        bossAvatarWrapper.classList.add('bossDeath');
+        setTimeout(() => {
+          spawnNewBoss("Streamer");
+          bossAvatarWrapper.classList.remove('bossDeath');
+        }, 800);
+      } else {
+        spawnNewBoss("Streamer");
+      }
+    }
+    
+    function streamerBoostChat() {
+      if (tiktokCredits < 1000) {
+        addChatMessage(`⚠️ Not enough TikTok credits (need 1000, have ${tiktokCredits})`);
+        return;
+      }
+      tiktokCredits -= 1000;
+      updateCreditsDisplay();
+      chatPower = 2.0;
+      addChatMessage(`✨ The streamer has boosted chat power! All attacks are now 2x stronger for 30 seconds!`);
+      setTimeout(() => {
+        chatPower = 1.0;
+        addChatMessage(`✨ Chat power boost has worn off. Attacks are back to normal.`);
+      }, 30000);
+    }
+    
+    function streamerHealBoss() {
+      const heal = Math.floor(maxHealth * 0.3);
+      bossHealth += heal;
+      if (bossHealth > maxHealth) bossHealth = maxHealth;
+      addChatMessage(`💖 The streamer heals ${currentBoss.name} for ${heal} health!`);
+      updateBossHealth();
+    }
+    
+    function streamerRageBoss() {
+      if (isBossEnraged) return;
+      isBossEnraged = true;
+      bossAvatarWrapper.classList.add('bossRage');
+      addChatMessage(`💢 The streamer has ENRAGED ${currentBoss.name}! It's now more powerful!`);
     }
     
     // ======================
@@ -3253,6 +1205,10 @@
       try {
         const data = JSON.parse(event.data);
         console.log('Received command via WebSocket:', data);
+        if (data.type === 'gift') {
+          addTikTokCredits(data.amount);
+          return;
+        }
         processBossCommand(data.command, data.username);
       } catch (error) {
         console.error("Error parsing WebSocket message:", error);
@@ -3272,51 +1228,42 @@
     // ======================
     // EVENT LISTENERS
     // ======================
-    attackBtn.addEventListener('click', () => {
-      performAttack(testUsernameInput.value || "Player");
-      startAttackCooldown(attackBtn, attackCooldownFill, 1000);
+    
+    spawnBossBtn.addEventListener('click', streamerSpawnBoss);
+    boostChatBtn.addEventListener('click', streamerBoostChat);
+    healBossBtn.addEventListener('click', streamerHealBoss);
+    rageBossBtn.addEventListener('click', streamerRageBoss);
+    showHelpBtn.addEventListener('click', () => { commandHelp.style.display = 'block'; });
+    closeHelp.addEventListener('click', () => { commandHelp.style.display = 'none'; });
+    
+    sendTestCommandBtn.addEventListener('click', () => {
+      const command = testCommandInput.value.trim();
+      const username = testUsernameInput.value.trim() || "TestUser";
+      if (command) {
+        processBossCommand(command, username);
+        testCommandInput.value = "";
+      }
     });
     
-    specialAttackBtn.addEventListener('click', () => {
-      performSpecialAttack(testUsernameInput.value || "Player");
+    testCommandInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') { sendTestCommandBtn.click(); }
     });
     
-    ability1Btn.addEventListener('click', () => {
-      performAbility(testUsernameInput.value || "Player", 0);
-    });
-    
-    ability2Btn.addEventListener('click', () => {
-      performAbility(testUsernameInput.value || "Player", 1);
-    });
-    
-    inventoryBtn.addEventListener('click', () => {
-      displayInventory(testUsernameInput.value || "Player");
-    });
-    
-    closeInventoryBtn.addEventListener('click', () => {
-      inventoryPanel.style.display = 'none';
-    });
+    testGiftBtn.addEventListener('click', () => { addTikTokCredits(100); });
     
     // ======================
     // INITIALIZATION
     // ======================
     updateBossHealth();
     updateScoreboard();
-    
-    // Initial boss spawn
+    updateCreditsDisplay();
     generatePixelBoss(currentBoss);
     bossAvatarWrapper.classList.add('bossEntrance');
-    setTimeout(() => bossAvatarWrapper.classList.remove('bossEntrance'), 800);
-    
-    // Start boss attacks
-    startBossAttacks();
-    
-    addChatMessage('🎮 Welcome to PIXEL BOSS BATTLEGROUND! Type !join to fight terrifying creatures!');
+    setTimeout(() => { bossAvatarWrapper.classList.remove('bossEntrance'); }, 800);
+    addChatMessage('🎮 Welcome to CHAT vs BOSS: ULTIMATE PIXEL HORROR! Type numbers 1-9 to attack, 0 to heal, 10 for a special attack (Lvl 5+), and !assist if on a combo streak.');
     addChatMessage(`💀 ${currentBoss.description}`);
     
-    // Make helper functions available globally for HTML onclick handlers
-    window.equipItem = equipItem;
-    window.unequipItem = unequipItem;
+    // Note: Periodic boss attacks remain removed – the boss now only counterattacks when players act.
   </script>
 </body>
 </html>
