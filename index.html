@@ -1,1269 +1,218 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Chat vs Boss: Ultimate Pixel Horror</title>
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <title>TikTok Gift Overlay</title>
   <style>
-    /* Global Styles */
-    body {
+    html, body {
       margin: 0;
       padding: 0;
-      font-family: 'Press Start 2P', cursive;
-      background-color: #000;
-      color: #fff;
+      background: linear-gradient(90deg, #1a2a6c, #b21f1f, #fdbb2d, #1a2a6c);
+      background-size: 400% 100%;
+      animation: gradient 30s linear infinite;
       overflow: hidden;
-      image-rendering: pixelated;
+      height: 100vh;
+      width: 100vw;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: sans-serif;
     }
-    
-    /* CRT screen effect */
-    #crtEffect {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: 
-        linear-gradient(rgba(18, 16, 16, 0.1) 50%, rgba(0, 0, 0, 0.25) 50%), 
-        linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-      background-size: 100% 4px, 3px 100%;
-      pointer-events: none;
-      z-index: 100;
+
+    @keyframes gradient {
+      0% { background-position: 0% 0%; }
+      100% { background-position: 400% 0%; }
     }
-    
-    /* Main container with scanlines */
-    #gameContainer {
-      width: 100%;
-      max-width: 480px;
-      margin: 0 auto;
-      padding: 20px;
-      box-sizing: border-box;
-      text-align: center;
-      font-size: 0.85em;
-      background-color: #111;
-      position: relative;
-      border: 4px solid #444;
-      box-shadow: 0 0 20px #0ff;
-    }
-    
-    /* Scanlines effect */
-    #gameContainer::before {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: linear-gradient(to bottom, transparent 0%, rgba(0, 255, 255, 0.05) 50%, transparent 100%);
-      background-size: 100% 4px;
-      pointer-events: none;
-      z-index: 1;
-    }
-    
-    .title {
-      font-size: 2em;
-      margin-bottom: 10px;
-      text-shadow: 0 0 10px #0ff, 2px 2px 4px #000;
-      color: #ff0;
-      position: relative;
-    }
-    
-    /* BOSS AREA */
-    #bossContainer {
-      position: relative;
-      width: 100%;
-      height: 360px;
-      margin-bottom: 20px;
-      overflow: hidden;
-      border: 3px solid #444;
-      background: #000;
-    }
-    
-    /* Health container at the top */
-    #bossHealthContainer {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      padding: 5px 10px;
-      box-sizing: border-box;
-      z-index: 2;
-    }
-    
-    #bossHealthBar {
-      width: 100%;
-      background: #444;
-      border-radius: 10px;
-      overflow: hidden;
-      height: 25px;
-      margin-bottom: 5px;
-      border: 2px solid #222;
-      box-shadow: 0 0 5px #f00;
-    }
-    
-    #bossHealthFill {
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, #ff4d4d, #990000);
-      transition: width 0.5s;
-    }
-    
-    #bossHealthText {
-      font-size: 1.1em;
-      font-weight: bold;
-      text-shadow: 1px 1px 3px #000;
-      color: #fff;
-    }
-    
-    /* Boss Canvas Wrapper */
-    #bossAvatarWrapper {
-      position: absolute;
-      top: 60px;
-      left: 50%;
-      transform: translateX(-50%);
-      transition: left 0.5s, top 0.5s;
-      z-index: 1;
-    }
-    
-    #bossCanvas {
-      width: 240px;
-      height: 240px;
-      max-width: 100%;
-      image-rendering: pixelated;
-      filter: drop-shadow(0 0 10px rgba(255, 0, 0, 0.7)) brightness(0.9) contrast(1.2);
-    }
-    
-    /* Blood flash overlay */
-    #bloodFlash {
-      position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(255, 0, 0, 0.3);
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.2s ease-out;
-      z-index: 3;
-    }
-    
-    .bloodVisible {
-      opacity: 1 !important;
-    }
-    
-    /* Boss flicker + shake animation */
-    @keyframes twitchFlicker {
-      0% { opacity: 1; transform: translate(0, 0); }
-      20% { opacity: 0.5; transform: translate(-5px, 5px); }
-      40% { opacity: 1; transform: translate(5px, -5px); }
-      60% { opacity: 0.5; transform: translate(-5px, 5px); }
-      80% { opacity: 1; transform: translate(5px, -5px); }
-      100% { opacity: 1; transform: translate(0, 0); }
-    }
-    
-    .hurt {
-      animation: twitchFlicker 0.3s;
-    }
-    
-    /* Boss entrance animation */
-    @keyframes bossEntrance {
-      0% { transform: translateX(-50%) scale(0.1); opacity: 0; }
-      50% { transform: translateX(-50%) scale(1.2); opacity: 1; }
-      100% { transform: translateX(-50%) scale(1); }
-    }
-    
-    .bossEntrance {
-      animation: bossEntrance 0.8s ease-out;
-    }
-    
-    /* Boss death animation */
-    @keyframes bossDeath {
-      0% { transform: translateX(-50%) scale(1); opacity: 1; }
-      50% { transform: translateX(-50%) scale(1.5); opacity: 0.8; }
-      100% { transform: translateX(-50%) scale(0.1); opacity: 0; }
-    }
-    
-    .bossDeath {
-      animation: bossDeath 0.8s ease-out;
-    }
-    
-    /* Boss rage animation */
-    @keyframes bossRage {
-      0% { filter: brightness(1) contrast(1); }
-      50% { filter: brightness(1.5) contrast(1.5); }
-      100% { filter: brightness(1) contrast(1); }
-    }
-    
-    .bossRage {
-      animation: bossRage 0.5s infinite;
-    }
-    
-    /* Chat Log styling */
-    #chatLog {
-      height: 200px;
-      overflow-y: auto;
-      background: rgba(0,0,0,0.7);
-      border: 2px solid #555;
-      border-radius: 10px;
-      padding: 10px;
-      margin-bottom: 15px;
-      text-align: left;
-      font-size: 0.8em;
-      box-shadow: inset 0 0 10px #000;
-    }
-    
-    #chatLog div {
-      margin: 5px 0;
-      opacity: 0;
-      animation: fadeIn 0.5s forwards;
-      line-height: 1.4;
-    }
-    
-    @keyframes fadeIn {
-      to { opacity: 1; }
-    }
-    
-    /* Scoreboard styling */
-    #scoreboard {
-      background: rgba(0,0,0,0.7);
-      border: 2px solid #555;
-      border-radius: 10px;
-      padding: 10px;
-      margin-top: 15px;
-      text-align: left;
-      max-height: 200px;
-      overflow-y: auto;
-      font-size: 0.8em;
-      box-shadow: inset 0 0 10px #000;
-    }
-    
-    #scoreboard h2 {
-      margin-top: 0;
-      font-size: 1em;
-      text-align: center;
-      color: #ff0;
-    }
-    
-    /* Each player entry spacing */
-    #scoreboardContent div {
-      margin-bottom: 10px;
-      line-height: 1.3;
-    }
-    
-    .levelUp {
-      color: #ff0;
-      font-size: 0.8em;
-      margin-left: 5px;
-      animation: levelUpFlash 2s ease-out;
-    }
-    
-    @keyframes levelUpFlash {
-      0% { opacity: 1; text-shadow: 0 0 5px #ff0; }
-      100% { opacity: 0; text-shadow: 0 0 10px #ff0; }
-    }
-    
-    /* Special effects */
-    .criticalHit {
-      color: #ff0;
-      text-shadow: 0 0 5px #f80;
-      font-weight: bold;
-    }
-    
-    .miss {
-      color: #888;
-      font-style: italic;
-    }
-    
-    /* Streamer controls */
-    #streamerControls {
-      position: fixed;
-      bottom: 10px;
-      right: 10px;
-      background: rgba(0,0,0,0.7);
-      border: 2px solid #555;
-      padding: 10px;
-      border-radius: 5px;
-      z-index: 1000;
+
+    .wrapper {
       display: flex;
       flex-direction: column;
-      gap: 5px;
+      align-items: center;
+      background: rgba(0,0,0,0.4);
+      padding: 20px 40px;
+      border-radius: 16px;
+      box-shadow: 0 0 40px rgba(0, 0, 0, 0.6);
+      max-width: 90vw;
+      overflow: hidden;
     }
-    
-    .streamerBtn {
-      background: #333;
-      border: 2px solid #555;
+
+    .top-label {
+      font-size: 24px;
       color: #fff;
-      padding: 5px;
-      font-family: 'Press Start 2P', cursive;
-      font-size: 0.7em;
-      cursor: pointer;
+      margin-bottom: 12px;
+      text-shadow: 0 0 5px black;
     }
-    
-    .streamerBtn:hover {
-      background: #555;
-      border-color: #0ff;
-      color: #0ff;
+
+    .carousel {
+      display: flex;
+      width: 100%;
+      animation: slidePages 24s ease-in-out infinite;
+      transition: transform 1s ease-in-out;
     }
-    
-    /* TikTok credits display */
-    #creditsDisplay {
-      position: fixed;
-      top: 10px;
-      right: 10px;
-      background: rgba(0,0,0,0.7);
-      border: 2px solid #555;
-      padding: 10px;
-      border-radius: 5px;
-      z-index: 1000;
-      font-size: 0.8em;
+
+
+    @keyframes slidePages {
+      0%, 12.5%   { transform: translateX(0%); }
+      12.6%, 25%  { transform: translateX(-100%); }
+      25.1%, 37.5%{ transform: translateX(-200%); }
+      37.6%, 50%  { transform: translateX(-300%); }
+      50.1%, 62.5%{ transform: translateX(-200%); }
+      62.6%, 75%  { transform: translateX(-100%); }
+      75.1%, 100% { transform: translateX(0%); }
     }
-    
-    #creditsCount {
-      color: #ff0;
-      font-weight: bold;
+
+    .page {
+      display: flex;
+      flex: 0 0 100%;
+      justify-content: center;
+      gap: 40px;
     }
-    
-    /* Command help */
-    #commandHelp {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: rgba(0,0,0,0.9);
-      border: 3px solid #555;
-      padding: 20px;
+
+    .pair {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      animation: pulse 4s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.03); }
+    }
+
+    .pair-row {
+      display: flex;
+      align-items: center;
+    }
+
+    .pair img {
+      height: 100px;
+      width: auto;
+      margin: 0 8px;
       border-radius: 10px;
-      z-index: 1001;
-      width: 80%;
-      max-width: 400px;
-      display: none;
+      box-shadow: 0 0 10px rgba(255,255,255,0.3);
     }
-    
-    #closeHelp {
-      position: absolute;
-      top: 5px;
-      right: 5px;
-      background: none;
-      border: none;
-      color: #fff;
-      font-size: 1.2em;
-      cursor: pointer;
+
+    .equals {
+      font-size: 30px;
+      color: white;
+      font-weight: bold;
+      text-shadow: 0 0 5px black;
     }
-    
-    /* Test command interface */
-    #testInterface {
-      position: fixed;
-      bottom: 10px;
-      left: 10px;
-      background: rgba(0,0,0,0.7);
-      border: 2px solid #555;
-      padding: 10px;
-      border-radius: 5px;
-      z-index: 1000;
-    }
-    
-    #testCommand {
-      font-family: 'Press Start 2P', cursive;
-      padding: 5px;
-      width: 200px;
-    }
-    
-    #testUsername {
-      font-family: 'Press Start 2P', cursive;
-      padding: 5px;
-      width: 150px;
-      margin-right: 5px;
-    }
-    
-    #sendTestCommand {
-      font-family: 'Press Start 2P', cursive;
-      padding: 5px;
-      cursor: pointer;
-    }
-    
-    /* Sleek/invisible scrollbar styling */
-    #scoreboard::-webkit-scrollbar,
-    #chatLog::-webkit-scrollbar {
-      width: 6px;
-    }
-    
-    #scoreboard::-webkit-scrollbar-thumb,
-    #chatLog::-webkit-scrollbar-thumb {
-      background-color: rgba(255,255,255,0.3);
-      border-radius: 3px;
+
+    .label {
+      font-size: 14px;
+      color: #eee;
+      margin-top: 4px;
+      text-align: center;
+      text-shadow: 0 0 3px black;
     }
   </style>
 </head>
 <body>
-  <!-- CRT screen effect overlay -->
-  <div id="crtEffect"></div>
-  
-  <!-- TikTok credits display -->
-  <div id="creditsDisplay">
-    TikTok Credits: <span id="creditsCount">0</span>
-    <div><small>Send gifts to power up!</small></div>
-  </div>
-  
-  <div id="gameContainer">
-    <h1 class="title">CHAT vs BOSS</h1>
-    
-    <!-- Boss Container -->
-    <div id="bossContainer">
-      <!-- Blood flash overlay -->
-      <div id="bloodFlash"></div>
-      
-      <!-- Health container at the top -->
-      <div id="bossHealthContainer">
-        <div id="bossHealthBar">
-          <div id="bossHealthFill"></div>
+  <div class="wrapper">
+    <div class="top-label">💬 555 / 👹 = Spawn Random Enemy</div>
+    <div class="carousel">
+      <!-- Page 1 -->
+      <div class="page">
+        <div class="pair">
+          <div class="pair-row">
+            <img src="https://p16-webcast.tiktokcdn.com/img/maliva/webcast-va/eba3a9bb85c33e017f3648eaf88d7189~tplv-obj.webp">
+            <div class="equals">=</div>
+            <img src="https://art.pixilart.com/47824505cade076.png">
+          </div>
+          <div class="label">Rose → x5 Bandana</div>
         </div>
-        <div id="bossHealthText">1000 / 1000</div>
+
+        <div class="pair">
+          <div class="pair-row">
+            <img src="https://p16-webcast.tiktokcdn.com/img/maliva/webcast-va/8e1a5d66370c5586545e358e37c10d25~tplv-obj.webp">
+            <div class="equals">=</div>
+            <img src="https://art.pixilart.com/9c0a90ed436d7f7.png">
+          </div>
+          <div class="label">Glow Stick → x10 Rubber</div>
+        </div>
+
+        <div class="pair">
+          <div class="pair-row">
+            <img src="https://p16-webcast.tiktokcdn.com/img/maliva/webcast-va/968820bc85e274713c795a6aef3f7c67~tplv-obj.webp">
+            <div class="equals">=</div>
+            <img src="https://imgs.search.brave.com/P-7obUkYFrCZKJ26e35CqWv2O7-j-SCAMMd5AoxN9Ag/rs:fit:500:0:0:0/g:ce/aHR0cHM6Ly9jZG4u/cGl4YWJheS5jb20v/cGhvdG8vMjAxNy8w/OS8yMy8xNi8zMy9w/aXhlbC1oZWFydC0y/Nzc5NDIyXzEyODAu/cG5n">
+          </div>
+          <div class="label">Ice Cream → Heal</div>
+        </div>
+
+        <div class="pair">
+          <div class="pair-row">
+            <img src="https://p16-webcast.tiktokcdn.com/img/maliva/webcast-va/3f02fa9594bd1495ff4e8aa5ae265eef~tplv-obj.webp">
+            <div class="equals">=</div>
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS4U8WHHkFhDO9zlh8qBgB3rF1Q-7lcYfD_ig&s">
+          </div>
+          <div class="label">GG → Ammo</div>
+        </div>
       </div>
-      
-      <!-- Boss Canvas below the health container -->
-      <div id="bossAvatarWrapper">
-        <canvas id="bossCanvas" width="64" height="64"></canvas>
+
+      <!-- Page 2 -->
+      <div class="page">
+        <div class="pair">
+          <div class="pair-row">
+            <img src="https://p16-webcast.tiktokcdn.com/img/maliva/webcast-va/676d2d4c31a8979f1fd06cdf5ecd922f~tplv-obj.webp">
+            <div class="equals">=</div>
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRyBk-J9fgOahQwpDexAFoYCAZogfRHhnU-QQ&s">
+          </div>
+          <div class="label">Popcorn → Chest</div>
+        </div>
+
+        <div class="pair">
+          <div class="pair-row">
+            <img src="https://p16-webcast.tiktokcdn.com/img/maliva/webcast-va/a4c4dc437fd3a6632aba149769491f49.png~tplv-obj.webp">
+            <div class="equals">=</div>
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS8jwFGkUrpWbf7cL4gT8KDyno4PFf9s28eWQ&s">
+          </div>
+          <div class="label">Finger Heart → AK-47</div>
+        </div>
+
+        <div class="pair">
+          <div class="pair-row">
+            <img src="https://p16-webcast.tiktokcdn.com/img/maliva/webcast-va/eb77ead5c3abb6da6034d3cf6cfeb438~tplv-obj.webp">
+            <div class="equals">=</div>
+            <img src="https://static.wikia.nocookie.net/survivio/images/4/4e/Loot-perk-endless-ammo.png/revision/latest?cb=20190829174508">
+          </div>
+          <div class="label">Rosa → Infinite Ammo</div>
+        </div>
+
+        <div class="pair">
+          <div class="pair-row">
+            <img src="https://p16-webcast.tiktokcdn.com/img/maliva/webcast-va/4e7ad6bdf0a1d860c538f38026d4e812~tplv-obj.webp">
+            <div class="equals">=</div>
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQQwAbXvHBH6WAOsPuIRyS1OM03m2IZ3P3uMQ&s">
+          </div>
+          <div class="label">Doughnut → Rocket Bullets</div>
+        </div>
       </div>
-    </div>
-    
-    <!-- Removed clickable special attack button.
-         Special attacks are now triggered by typing "10" in chat -->
-    
-    <!-- Chat log -->
-    <div id="chatLog"></div>
-    
-    <!-- Scoreboard -->
-    <div id="scoreboard">
-      <h2>SCOREBOARD</h2>
-      <div id="scoreboardContent">No players yet.</div>
-    </div>
-  </div>
-  
-  <!-- Streamer controls -->
-  <div id="streamerControls">
-    <h3>STREAMER</h3>
-    <button class="streamerBtn" id="spawnBossBtn">SPAWN BOSS</button>
-    <button class="streamerBtn" id="boostChatBtn">BOOST CHAT (1000)</button>
-    <button class="streamerBtn" id="healBossBtn">HEAL BOSS</button>
-    <button class="streamerBtn" id="rageBossBtn">RAGE BOSS</button>
-    <button class="streamerBtn" id="showHelpBtn">SHOW HELP</button>
-  </div>
-  
-  <!-- Command help modal -->
-  <div id="commandHelp">
-    <button id="closeHelp">✕</button>
-    <h2>HOW TO PLAY</h2>
-    <p>Type numbers in chat to attack:</p>
-    <ul style="text-align: left; list-style-type: none; padding-left: 0;">
-      <li>1-9: Regular attacks (higher numbers do more damage but hit less often)</li>
-      <li>0: Heal boss (10-30 HP)</li>
-      <li>10: Special attack (requires level 5+)</li>
-      <li>!assist: If your combo is 5 or higher, call in an assist attack for bonus damage</li>
-    </ul>
-    <p>Send TikTok gifts to power up attacks!</p>
-    <p>If you are defeated, use <code>!revive</code> to come back.</p>
-  </div>
-  
-  <!-- Test command interface -->
-  <div id="testInterface">
-    <h3>TEST COMMANDS</h3>
-    <input type="text" id="testUsername" value="TestUser" placeholder="Username">
-    <input type="text" id="testCommand" value="1" placeholder="Command (0-10, !revive, !assist)">
-    <button id="sendTestCommand">SEND</button>
-    <div>
-      <button id="testGiftBtn">SEND GIFT (100)</button>
+
+      <!-- Page 3 -->
+      <div class="page">
+        <div class="pair">
+          <div class="pair-row">
+            <img src="https://p16-webcast.tiktokcdn.com/img/maliva/webcast-va/20ec0eb50d82c2c445cb8391fd9fe6e2~tplv-obj.webp">
+            <div class="equals">=</div>
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR7p2FQoCqVpTgXtbAuIR_P5gUpphDelLnZXA&s">
+          </div>
+          <div class="label">Controller → Flame Hand</div>
+        </div>
+
+        <div class="pair">
+          <div class="pair-row">
+            <img src="https://p16-webcast.tiktokcdn.com/img/maliva/webcast-va/resource/cbd7588c53ec3df1af0ed6d041566362.png~tplv-obj.webp">
+            <div class="equals">=</div>
+            <img src="https://static.wikia.nocookie.net/enterthegungeon_gamepedia/images/d/d4/High_Dragun.png/revision/latest?cb=20160305024157">
+          </div>
+          <div class="label">Super GG → Dragun Boss</div>
+        </div>
+      </div>
+
     </div>
   </div>
-  
-  <script>
-    // ======================
-    // GAME STATE VARIABLES
-    // ======================
-    
-    const bossTypes = [
-      {
-        name: "The Flesh Horror",
-        healthMultiplier: 1.0,
-        description: "A writhing mass of flesh and teeth!",
-        specialWeakness: "fire",
-        palette: ['#330000', '#660000', '#990000', '#cc0000', '#ff0000'],
-        complexity: 6,
-        symmetry: 0.4,
-        features: ["teeth", "eyes", "tendrils"]
-      },
-      {
-        name: "The Bone Reaper",
-        healthMultiplier: 1.2,
-        description: "A skeletal monstrosity wielding a cursed scythe!",
-        specialWeakness: "holy",
-        palette: ['#333333', '#555555', '#777777', '#999999', '#bbbbbb'],
-        complexity: 5,
-        symmetry: 0.8,
-        features: ["bones", "scythe", "hollow eyes"]
-      },
-      {
-        name: "The Void Stalker",
-        healthMultiplier: 0.9,
-        description: "A shadowy entity from beyond reality!",
-        specialWeakness: "light",
-        palette: ['#000033', '#000066', '#000099', '#0000cc', '#0000ff'],
-        complexity: 7,
-        symmetry: 0.6,
-        features: ["void", "tendrils", "glowing eyes"]
-      },
-      {
-        name: "The Plaguebringer",
-        healthMultiplier: 1.1,
-        description: "A rotting abomination dripping with pestilence!",
-        specialWeakness: "fire",
-        palette: ['#003300', '#006600', '#009900', '#00cc00', '#00ff00'],
-        complexity: 6,
-        symmetry: 0.5,
-        features: ["rot", "pus", "tentacles"]
-      },
-      {
-        name: "The Infernal Demon",
-        healthMultiplier: 1.3,
-        description: "A horned beast from the deepest pits of hell!",
-        specialWeakness: "holy",
-        palette: ['#330033', '#660066', '#990099', '#cc00cc', '#ff00ff'],
-        complexity: 5,
-        symmetry: 0.7,
-        features: ["horns", "fire", "claws"]
-      },
-      {
-        name: "The Many-Eyed Watcher",
-        healthMultiplier: 0.8,
-        description: "A grotesque being covered in blinking eyes!",
-        specialWeakness: "arcane",
-        palette: ['#333300', '#666600', '#999900', '#cccc00', '#ffff00'],
-        complexity: 8,
-        symmetry: 0.3,
-        features: ["eyes", "mouths", "tendrils"]
-      }
-    ];
-    
-    let bossLevel = 1;
-    const baseHealth = 1000;
-    let maxHealth = baseHealth;
-    let bossHealth = maxHealth;
-    let currentBoss = bossTypes[0];
-    let isSpecialAttackOnCooldown = false;
-    let isBossEnraged = false;
-    let bossShieldActive = false;
-    let bossPhase = 1;  // New: Tracks transformation phase
-    let tiktokCredits = 0;
-    let chatPower = 1.0;
-    
-    // Player ranking now tracks combo count
-    const ranking = {};
-    const joinedPlayers = new Set();
-    
-    // ======================
-    // DOM ELEMENTS
-    // ======================
-    
-    const bossHealthText = document.getElementById('bossHealthText');
-    const bossHealthFill = document.getElementById('bossHealthFill');
-    const bossCanvas = document.getElementById('bossCanvas');
-    const bossCtx = bossCanvas.getContext('2d');
-    const bossAvatarWrapper = document.getElementById('bossAvatarWrapper');
-    const bloodFlash = document.getElementById('bloodFlash');
-    
-    const chatLog = document.getElementById('chatLog');
-    const scoreboardContent = document.getElementById('scoreboardContent');
-    
-    const spawnBossBtn = document.getElementById('spawnBossBtn');
-    const boostChatBtn = document.getElementById('boostChatBtn');
-    const healBossBtn = document.getElementById('healBossBtn');
-    const rageBossBtn = document.getElementById('rageBossBtn');
-    const showHelpBtn = document.getElementById('showHelpBtn');
-    
-    const creditsCount = document.getElementById('creditsCount');
-    
-    const commandHelp = document.getElementById('commandHelp');
-    const closeHelp = document.getElementById('closeHelp');
-    
-    const testCommandInput = document.getElementById('testCommand');
-    const testUsernameInput = document.getElementById('testUsername');
-    const sendTestCommandBtn = document.getElementById('sendTestCommand');
-    const testGiftBtn = document.getElementById('testGiftBtn');
-    
-    // ======================
-    // PIXEL BOSS GENERATION (FIXED)
-    // ======================
-    
-    function generatePixelBoss(bossType) {
-      const size = 64;
-      const grid = [];
-      for (let y = 0; y < size; y++) {
-        grid[y] = [];
-        for (let x = 0; x < size; x++) {
-          grid[y][x] = 0;
-        }
-      }
-      
-      const center = size / 2;
-      const complexity = bossType.complexity;
-      const symmetry = bossType.symmetry;
-      
-      for (let layer = 0; layer < complexity; layer++) {
-        const layerSize = size - (layer * 8);
-        if (layerSize <= 0) break;
-        const startX = Math.floor((size - layerSize) / 2);
-        const startY = Math.floor((size - layerSize) / 2);
-        for (let y = startY; y < startY + layerSize; y++) {
-          for (let x = startX; x < startX + layerSize; x++) {
-            if (grid[y][x] !== 0) continue;
-            const distFromCenter = Math.sqrt(Math.pow(x - center, 2) + Math.pow(y - center, 2));
-            const maxDist = layerSize / 2;
-            const normalizedDist = distFromCenter / maxDist;
-            let chance = 1 - normalizedDist;
-            chance *= 0.4 + Math.random() * 0.6;
-            chance *= 1 - (layer / complexity);
-            if (chance > 0.5) {
-              const colorIndex = Math.floor(Math.random() * bossType.palette.length);
-              grid[y][x] = colorIndex + 1;
-              if (Math.random() < symmetry) {
-                const symX = size - 1 - x;
-                const symY = size - 1 - y;
-                if (symX >= 0 && symX < size && symY >= 0 && symY < size) {
-                  grid[symY][symX] = colorIndex + 1;
-                }
-              }
-            }
-          }
-        }
-      }
-      addBossFeatures(grid, bossType, center);
-      renderPixelGrid(grid, bossType.palette);
-    }
-    
-    function addBossFeatures(grid, bossType, center) {
-      const size = grid.length;
-      if (bossType.features.includes("eyes")) {
-        const eyeCount = bossType.name.includes("Many-Eyed") ? 8 + Math.floor(Math.random() * 5) : 2;
-        for (let i = 0; i < eyeCount; i++) {
-          let eyeX, eyeY;
-          if (i < 2) {
-            eyeX = center - 10 + (i * 20);
-            eyeY = center - 5;
-          } else {
-            eyeX = center - 15 + Math.floor(Math.random() * 30);
-            eyeY = center - 15 + Math.floor(Math.random() * 30);
-          }
-          for (let y = eyeY - 2; y <= eyeY + 2; y++) {
-            for (let x = eyeX - 2; x <= eyeX + 2; x++) {
-              if (x >= 0 && x < size && y >= 0 && y < size) {
-                grid[y][x] = bossType.palette.length;
-              }
-            }
-          }
-          if (eyeX >= 0 && eyeX < size && eyeY >= 0 && eyeY < size) {
-            grid[eyeY][eyeX] = 1;
-          }
-        }
-      }
-      
-      if (bossType.features.includes("teeth") || bossType.features.includes("mouths")) {
-        const mouthWidth = 15 + Math.floor(Math.random() * 10);
-        const mouthHeight = 5 + Math.floor(Math.random() * 3);
-        const mouthY = center + 10;
-        for (let x = center - mouthWidth/2; x < center + mouthWidth/2; x++) {
-          for (let y = mouthY; y < mouthY + mouthHeight; y++) {
-            if (x >= 0 && x < size && y >= 0 && y < size) {
-              grid[y][x] = Math.random() < 0.3 ? bossType.palette.length : 1;
-            }
-          }
-        }
-      }
-      
-      if (bossType.features.includes("tendrils") || bossType.features.includes("tentacles")) {
-        const tendrilCount = 4 + Math.floor(Math.random() * 4);
-        for (let i = 0; i < tendrilCount; i++) {
-          const angle = (i / tendrilCount) * Math.PI * 2;
-          const length = 15 + Math.floor(Math.random() * 10);
-          const thickness = 1 + Math.floor(Math.random() * 2);
-          for (let l = 0; l < length; l++) {
-            const tendrilX = Math.round(center + Math.cos(angle) * l);
-            const tendrilY = Math.round(center + Math.sin(angle) * l);
-            for (let t = -thickness; t <= thickness; t++) {
-              const tx = Math.round(tendrilX + Math.cos(angle + Math.PI/2) * t);
-              const ty = Math.round(tendrilY + Math.sin(angle + Math.PI/2) * t);
-              if (tx >= 0 && tx < size && ty >= 0 && ty < size) {
-                grid[ty][tx] = 2;
-              }
-            }
-          }
-        }
-      }
-      
-      if (bossType.features.includes("horns")) {
-        for (let i = 0; i < 2; i++) {
-          const hornX = center - 15 + (i * 30);
-          const hornY = center - 20;
-          const hornLength = 10 + Math.floor(Math.random() * 5);
-          const hornAngle = i === 0 ? -Math.PI/4 : Math.PI/4;
-          for (let l = 0; l < hornLength; l++) {
-            const hx = Math.round(hornX + Math.cos(hornAngle) * l);
-            const hy = Math.round(hornY + Math.sin(hornAngle) * l);
-            if (hx >= 0 && hx < size && hy >= 0 && hy < size) {
-              grid[hy][hx] = 1;
-            }
-          }
-        }
-      }
-    }
-    
-    function renderPixelGrid(grid, palette) {
-      const size = grid.length;
-      const pixelSize = bossCanvas.width / size;
-      bossCtx.clearRect(0, 0, bossCanvas.width, bossCanvas.height);
-      for (let y = 0; y < size; y++) {
-        for (let x = 0; x < size; x++) {
-          if (grid[y][x] > 0) {
-            bossCtx.fillStyle = palette[grid[y][x] - 1];
-            bossCtx.fillRect(x * pixelSize, y * pixelSize, pixelSize, pixelSize);
-          }
-        }
-      }
-      // Apply boss filters; if shield is active, add a blue glow.
-      if (currentBoss.features.includes("void") || currentBoss.features.includes("fire")) {
-        bossCanvas.style.filter = "drop-shadow(0 0 10px rgba(255, 0, 0, 0.7)) brightness(1.1) contrast(1.3)";
-      } else {
-        bossCanvas.style.filter = "drop-shadow(0 0 10px rgba(255, 0, 0, 0.7)) brightness(0.9) contrast(1.2)";
-      }
-      bossCanvas.style.boxShadow = bossShieldActive ? "0 0 15px #00f" : "none";
-    }
-    
-    // ======================
-    // UTILITY FUNCTIONS
-    // ======================
-    
-    function addChatMessage(message, isCritical = false, isMiss = false) {
-      const messageEl = document.createElement('div');
-      messageEl.textContent = message;
-      if (isCritical) messageEl.classList.add('criticalHit');
-      if (isMiss) messageEl.classList.add('miss');
-      chatLog.appendChild(messageEl);
-      chatLog.scrollTop = chatLog.scrollHeight;
-    }
-    
-    function updateBossHealth() {
-      if (bossHealth < 0) bossHealth = 0;
-      bossHealthText.textContent = `${bossHealth} / ${maxHealth}`;
-      const percent = (bossHealth / maxHealth) * 100;
-      bossHealthFill.style.width = percent + "%";
-      // Trigger transformation if boss drops below 50% and is still phase 1
-      if (bossPhase === 1 && bossHealth < maxHealth * 0.5) {
-        transformBoss();
-      }
-      if (bossHealth < maxHealth * 0.3 && !isBossEnraged) {
-        isBossEnraged = true;
-        bossAvatarWrapper.classList.add('bossRage');
-        addChatMessage(`💢 ${currentBoss.name} ENRAGES as its health drops! Attacks are stronger!`);
-      } else if (bossHealth >= maxHealth * 0.3 && isBossEnraged) {
-        isBossEnraged = false;
-        bossAvatarWrapper.classList.remove('bossRage');
-      }
-    }
-    
-    // Update scoreboard (including combo count)
-    function updateScoreboard() {
-      const scores = Object.entries(ranking)
-        .filter(([user]) => user !== "Streamer")
-        .sort((a, b) => {
-          if (b[1].bossesKilled === a[1].bossesKilled) return b[1].damage - a[1].damage;
-          return b[1].bossesKilled - a[1].bossesKilled;
-        });
-      
-      let html = scores.map(([user, stats]) => {
-        const levelUpText = stats.levelUp ? `<span class="levelUp">LEVEL UP!</span>` : "";
-        const comboText = stats.combo > 1 ? ` | Combo: ${stats.combo}` : "";
-        const hpDisplay = stats.hp > 0 ? `HP: ${stats.hp}/${stats.maxHp}` : `<span style="color:#f00;">DEAD</span>`;
-        return `<div>
-                  <strong>${user}</strong>: ${stats.bossesKilled} boss kills, ${stats.damage} dmg, Level ${stats.level} ${levelUpText}${comboText}<br>
-                  <small>XP: ${stats.xp}/${stats.level * 100} | ${hpDisplay}</small>
-                </div>`;
-      }).join("");
-      scoreboardContent.innerHTML = html || "No players yet.";
-    }
-    
-    function showBloodFlash() {
-      bloodFlash.classList.add('bloodVisible');
-      setTimeout(() => { bloodFlash.classList.remove('bloodVisible'); }, 200);
-    }
-    
-    function bossFlicker() {
-      bossAvatarWrapper.classList.add('hurt');
-      const dx = Math.floor(Math.random() * 21) - 10;
-      const dy = Math.floor(Math.random() * 11) - 5;
-      bossAvatarWrapper.style.left = `calc(50% + ${dx}px)`;
-      bossAvatarWrapper.style.top = `${60 + dy}px`;
-      setTimeout(() => {
-        bossAvatarWrapper.classList.remove('hurt');
-        bossAvatarWrapper.style.left = '50%';
-        bossAvatarWrapper.style.top = '60px';
-      }, 300);
-    }
-    
-    function checkLevelUp(username) {
-      const player = ranking[username];
-      let threshold = player.level * 100;
-      let leveledUp = false;
-      while (player.xp >= threshold) {
-        player.xp -= threshold;
-        player.level++;
-        leveledUp = true;
-        threshold = player.level * 100;
-      }
-      if (leveledUp) {
-        player.levelUp = true;
-        updateScoreboard();
-        addChatMessage(`🎉 ${username} leveled up to level ${player.level}!`);
-        setTimeout(() => { player.levelUp = false; updateScoreboard(); }, 3000);
-      }
-    }
-    
-    // New: Boss transformation phase
-    function transformBoss() {
-      bossPhase = 2;
-      addChatMessage(`🔥 ${currentBoss.name} transforms into its enraged form! Its attacks become even more ferocious!`);
-      bossCanvas.style.filter = "drop-shadow(0 0 20px #f00) brightness(1.2) contrast(1.4)";
-    }
-    
-    // New: Environmental hazard event (triggers randomly every 30 seconds)
-    function triggerEnvironmentalHazard() {
-      // 50% chance to damage players or heal boss
-      if (Math.random() < 0.5) {
-        addChatMessage("🌪️ An earthquake shakes the arena! All players take 10 damage.");
-        for (const user in ranking) {
-          if (user !== "Streamer") {
-            ranking[user].hp -= 10;
-            if (ranking[user].hp < 0) ranking[user].hp = 0;
-          }
-        }
-      } else {
-        const heal = 50;
-        bossHealth += heal;
-        if (bossHealth > maxHealth) bossHealth = maxHealth;
-        addChatMessage(`🌧️ A sudden rain of healing waters restores ${heal} health to ${currentBoss.name}!`);
-        updateBossHealth();
-      }
-      updateScoreboard();
-    }
-    
-    // Set an interval for environmental hazards (every 30 seconds, 10% chance)
-    setInterval(() => {
-      if (Math.random() < 0.1) {
-        triggerEnvironmentalHazard();
-      }
-    }, 30000);
-    
-    // Special attack (triggered by "10")
-    function performSpecialAttack(username) {
-      if (isSpecialAttackOnCooldown) return;
-      const player = ranking[username];
-      if (!player || player.level < 5) {
-        addChatMessage(`⚠️ ${username}, you need to be level 5+ to use special attacks`);
-        return;
-      }
-      let damage = Math.floor(50 + Math.random() * 50);
-      damage = Math.floor(damage * (1 + ((player.combo - 1) * 0.1)));
-      const isWeakness = Math.random() < 0.3;
-      const effectiveDamage = isWeakness ? Math.floor(damage * 1.5) : damage;
-      if (bossShieldActive) {
-        addChatMessage(`🛡️ ${username} tried a special attack, but ${currentBoss.name}'s shield absorbed it!`);
-      } else {
-        if (isWeakness) {
-          addChatMessage(`🌟 ${username} unleashes a ${currentBoss.specialWeakness.toUpperCase()} special attack, exploiting ${currentBoss.name}'s weakness for ${effectiveDamage} damage!`, true);
-        } else {
-          addChatMessage(`✨ ${username} performs a special attack dealing ${effectiveDamage} damage!`);
-        }
-        bossHealth -= effectiveDamage;
-        player.damage += effectiveDamage;
-        player.xp += effectiveDamage;
-        checkLevelUp(username);
-        updateBossHealth();
-        showBloodFlash();
-        bossFlicker();
-        updateScoreboard();
-        if (bossHealth <= 0) {
-          addChatMessage(`💀 ${username} defeated ${currentBoss.name} with a powerful special attack!`);
-          bossAvatarWrapper.classList.add('bossDeath');
-          setTimeout(() => {
-            spawnNewBoss(username);
-            bossAvatarWrapper.classList.remove('bossDeath');
-          }, 800);
-        }
-      }
-      startSpecialAttackCooldown();
-    }
-    
-    function startSpecialAttackCooldown() {
-      isSpecialAttackOnCooldown = true;
-      let cooldown = 100;
-      const cooldownInterval = setInterval(() => {
-        cooldown--;
-        if (cooldown <= 0) {
-          clearInterval(cooldownInterval);
-          isSpecialAttackOnCooldown = false;
-        }
-      }, 50);
-    }
-    
-    function updateCreditsDisplay() {
-      creditsCount.textContent = tiktokCredits;
-    }
-    
-    function addTikTokCredits(amount) {
-      tiktokCredits += amount;
-      updateCreditsDisplay();
-      addChatMessage(`🎁 Received ${amount} TikTok credits! Current total: ${tiktokCredits}`);
-    }
-    
-    function spawnNewBoss(killer) {
-      bossLevel++;
-      isBossEnraged = false;
-      bossShieldActive = false;
-      bossPhase = 1;
-      bossAvatarWrapper.classList.remove('bossRage');
-      const bossIndex = Math.floor(Math.random() * bossTypes.length);
-      currentBoss = bossTypes[bossIndex];
-      maxHealth = Math.floor(baseHealth * currentBoss.healthMultiplier) + (bossLevel - 1) * 500;
-      bossHealth = maxHealth;
-      updateBossHealth();
-      generatePixelBoss(currentBoss);
-      bossAvatarWrapper.classList.add('bossEntrance');
-      setTimeout(() => bossAvatarWrapper.classList.remove('bossEntrance'), 800);
-      addChatMessage(`🔥 ${currentBoss.description}`);
-      addChatMessage(`💀 A new boss: ${currentBoss.name} (Level ${bossLevel}) has appeared!`);
-      if (killer && !ranking[killer]) {
-        ranking[killer] = { damage: 0, bossesKilled: 0, xp: 0, level: 1, levelUp: false, hp: 100, maxHp: 100, combo: 0 };
-      }
-      if (killer) ranking[killer].bossesKilled++;
-      updateScoreboard();
-    }
-    
-    function bossCounterAttack(username) {
-      const missChance = 0.3;
-      if (Math.random() < missChance) {
-        addChatMessage(`👾 ${currentBoss.name} counterattacks ${username} but misses!`, false, true);
-      } else {
-        const damage = Math.floor(Math.random() * 11) + 5;
-        ranking[username].hp -= damage;
-        if (ranking[username].hp < 0) ranking[username].hp = 0;
-        addChatMessage(`👾 ${currentBoss.name} counterattacks ${username} for ${damage} damage!`);
-        updateScoreboard();
-        if (ranking[username].hp <= 0) {
-          addChatMessage(`💀 ${username} has been defeated by ${currentBoss.name}! Use !revive to try again.`, true);
-        }
-      }
-    }
-    
-    // New: Player assist command
-    function performAssistAttack(username) {
-      const player = ranking[username];
-      if (player.combo < 5) {
-        addChatMessage(`⚠️ ${username}, you need a combo of at least 5 to call for an assist!`);
-        return;
-      }
-      const damage = player.combo * 20;
-      addChatMessage(`🚀 ${username} calls in an ASSIST attack, dealing ${damage} bonus damage!`, true);
-      if (!bossShieldActive) {
-        bossHealth -= damage;
-        player.damage += damage;
-        player.xp += damage;
-      } else {
-        addChatMessage(`🛡️ But the assist was absorbed by ${currentBoss.name}'s shield!`);
-      }
-      player.combo = 0;
-      checkLevelUp(username);
-      updateBossHealth();
-      showBloodFlash();
-      bossFlicker();
-      updateScoreboard();
-      if (bossHealth <= 0) {
-        addChatMessage(`💀 ${username} dealt the final blow to ${currentBoss.name}!`);
-        bossAvatarWrapper.classList.add('bossDeath');
-        setTimeout(() => {
-          spawnNewBoss(username);
-          bossAvatarWrapper.classList.remove('bossDeath');
-        }, 800);
-      }
-      // Boss counterattacks after assist as well.
-      if (bossHealth > 0) bossCounterAttack(username);
-    }
-    
-    function processBossCommand(command, username = "Viewer") {
-      command = command.trim();
-      if (!command) return;
-      
-      if (!joinedPlayers.has(username)) {
-        joinedPlayers.add(username);
-        ranking[username] = { damage: 0, bossesKilled: 0, xp: 0, level: 1, levelUp: false, hp: 100, maxHp: 100, combo: 0 };
-        if(username !== "Streamer") addChatMessage(`🔔 ${username} joined the fight!`);
-        updateScoreboard();
-      }
-      
-      if (command.startsWith("!revive")) {
-        const player = ranking[username];
-        if (player.hp > 0) {
-          addChatMessage(`${username}, you are still alive!`);
-        } else {
-          player.hp = player.maxHp;
-          addChatMessage(`💖 ${username} has been revived!`);
-          updateScoreboard();
-        }
-        return;
-      }
-      
-      if (ranking[username].hp <= 0) {
-        addChatMessage(`${username}, you are dead. Use !revive to come back.`);
-        return;
-      }
-      
-      // New assist command
-      if (command.startsWith("!assist")) {
-        performAssistAttack(username);
-        return;
-      }
-      
-      if (/^(10|[0-9])$/.test(command)) {
-        if (command === "10") {
-          performSpecialAttack(username);
-          if (bossHealth > 0) bossCounterAttack(username);
-          ranking[username].combo = 0;
-          return;
-        }
-        const num = parseInt(command);
-        if (num === 0) {
-          const heal = Math.floor(Math.random() * 21) + 10;
-          bossHealth += heal;
-          if (bossHealth > maxHealth) bossHealth = maxHealth;
-          addChatMessage(`💖 ${username} heals ${currentBoss.name} for ${heal} health!`);
-          updateBossHealth();
-          return;
-        }
-        
-        let hitChance = 1.0 - (num - 1) * 0.05;
-        if (Math.random() > hitChance) {
-          addChatMessage(`⚔️ ${username} attacked with a ${num} attack but missed!`, false, true);
-          ranking[username].combo = 0;
-          if (bossHealth > 0) bossCounterAttack(username);
-          return;
-        }
-        
-        let damageRange;
-        if (num <= 3) {
-          damageRange = { min: 10, max: 30 };
-        } else if (num <= 6) {
-          damageRange = { min: 30, max: 60 };
-        } else {
-          damageRange = { min: 60, max: 90 };
-        }
-        let damage = Math.floor(Math.random() * (damageRange.max - damageRange.min + 1)) + damageRange.min;
-        damage = Math.floor(damage * (1 + (ranking[username].level * 0.05)));
-        damage = Math.floor(damage * (1 + ((ranking[username].combo || 0) * 0.1)));
-        damage = Math.floor(damage * chatPower);
-        const critChance = 0.15 + (ranking[username].level * 0.01);
-        const isCritical = Math.random() < critChance;
-        if (isCritical) {
-          damage = Math.floor(damage * 1.5);
-          addChatMessage(`💥 CRITICAL HIT! ${username} attacks ${currentBoss.name} for ${damage} damage!`, true);
-        } else {
-          addChatMessage(`⚔️ ${username} attacks ${currentBoss.name} for ${damage} damage!`);
-        }
-        
-        if (bossShieldActive) {
-          addChatMessage(`🛡️ ${username}'s attack was absorbed by ${currentBoss.name}'s shield!`);
-        } else {
-          bossHealth -= damage;
-          ranking[username].damage += damage;
-          ranking[username].xp += damage;
-          ranking[username].combo = (ranking[username].combo || 0) + 1;
-          if (ranking[username].combo >= 3) {
-            addChatMessage(`🔥 ${username} is on a streak! (Combo: ${ranking[username].combo})`);
-          }
-        }
-        
-        checkLevelUp(username);
-        updateBossHealth();
-        showBloodFlash();
-        bossFlicker();
-        updateScoreboard();
-        if (bossHealth <= 0) {
-          addChatMessage(`💀 ${username} dealt the final blow to ${currentBoss.name}!`);
-          bossAvatarWrapper.classList.add('bossDeath');
-          setTimeout(() => {
-            spawnNewBoss(username);
-            bossAvatarWrapper.classList.remove('bossDeath');
-          }, 800);
-          return;
-        }
-        if (bossHealth > 0) bossCounterAttack(username);
-        if (!bossShieldActive && bossHealth < maxHealth * 0.7 && Math.random() < 0.2) {
-          activateBossShield();
-        }
-      }
-      else if (command.startsWith("!attack")) {
-        const isCritical = Math.random() < 0.15;
-        let damage = Math.floor(Math.random() * 41) + 10;
-        if (isBossEnraged) damage = Math.floor(damage * 0.8);
-        if (isCritical) {
-          damage = Math.floor(damage * 1.5);
-          addChatMessage(`💥 CRITICAL HIT! ${username} attacks ${currentBoss.name} for ${damage} damage!`, true);
-        } else {
-          addChatMessage(`⚔️ ${username} attacks ${currentBoss.name} for ${damage} damage!`);
-        }
-        if (!bossShieldActive) {
-          bossHealth -= damage;
-          ranking[username].damage += damage;
-          ranking[username].xp += damage;
-        } else {
-          addChatMessage(`🛡️ ${username}'s attack was absorbed by ${currentBoss.name}'s shield!`);
-        }
-        checkLevelUp(username);
-        updateBossHealth();
-        showBloodFlash();
-        bossFlicker();
-        updateScoreboard();
-        if (bossHealth <= 0) {
-          addChatMessage(`💀 ${username} dealt the final blow to ${currentBoss.name}!`);
-          bossAvatarWrapper.classList.add('bossDeath');
-          setTimeout(() => {
-            spawnNewBoss(username);
-            bossAvatarWrapper.classList.remove('bossDeath');
-          }, 800);
-        }
-      }
-      else if (command.startsWith("!stats")) {
-        const stats = ranking[username];
-        addChatMessage(`📊 ${username} Stats: ${stats.bossesKilled} boss kills, ${stats.damage} dmg, Level ${stats.level} (XP: ${stats.xp}/${stats.level * 100}) | HP: ${stats.hp}/${stats.maxHp} | Combo: ${stats.combo || 0}`);
-      }
-      else if (command.startsWith("!help")) {
-        addChatMessage(`💡 Type numbers 1-9 to attack (higher numbers = stronger but lower hit chance), 0 to heal, 10 for a special attack (Lvl 5+), and !assist (if combo ≥ 5). Use !revive if you are defeated!`);
-      }
-    }
-    
-    // ======================
-    // STREAMER FUNCTIONS
-    // ======================
-    
-    function streamerSpawnBoss() {
-      if (bossHealth > 0) {
-        addChatMessage(`💀 The streamer has forced ${currentBoss.name} to retreat!`);
-        bossAvatarWrapper.classList.add('bossDeath');
-        setTimeout(() => {
-          spawnNewBoss("Streamer");
-          bossAvatarWrapper.classList.remove('bossDeath');
-        }, 800);
-      } else {
-        spawnNewBoss("Streamer");
-      }
-    }
-    
-    function streamerBoostChat() {
-      if (tiktokCredits < 1000) {
-        addChatMessage(`⚠️ Not enough TikTok credits (need 1000, have ${tiktokCredits})`);
-        return;
-      }
-      tiktokCredits -= 1000;
-      updateCreditsDisplay();
-      chatPower = 2.0;
-      addChatMessage(`✨ The streamer has boosted chat power! All attacks are now 2x stronger for 30 seconds!`);
-      setTimeout(() => {
-        chatPower = 1.0;
-        addChatMessage(`✨ Chat power boost has worn off. Attacks are back to normal.`);
-      }, 30000);
-    }
-    
-    function streamerHealBoss() {
-      const heal = Math.floor(maxHealth * 0.3);
-      bossHealth += heal;
-      if (bossHealth > maxHealth) bossHealth = maxHealth;
-      addChatMessage(`💖 The streamer heals ${currentBoss.name} for ${heal} health!`);
-      updateBossHealth();
-    }
-    
-    function streamerRageBoss() {
-      if (isBossEnraged) return;
-      isBossEnraged = true;
-      bossAvatarWrapper.classList.add('bossRage');
-      addChatMessage(`💢 The streamer has ENRAGED ${currentBoss.name}! It's now more powerful!`);
-    }
-    
-    // ======================
-    // WEBSOCKET INTEGRATION
-    // ======================
-    const socket = new WebSocket('ws://localhost:55001');
-    
-    socket.addEventListener('open', () => {
-      console.log('WebSocket connection established.');
-      addChatMessage('🔌 Connected to chat server!');
-    });
-    
-    socket.addEventListener('message', (event) => {
-      try {
-        const data = JSON.parse(event.data);
-        console.log('Received command via WebSocket:', data);
-        if (data.type === 'gift') {
-          addTikTokCredits(data.amount);
-          return;
-        }
-        processBossCommand(data.command, data.username);
-      } catch (error) {
-        console.error("Error parsing WebSocket message:", error);
-      }
-    });
-    
-    socket.addEventListener('error', (error) => {
-      console.error("WebSocket error:", error);
-      addChatMessage('⚠️ Connection error with chat server!');
-    });
-    
-    socket.addEventListener('close', () => {
-      console.log('WebSocket connection closed.');
-      addChatMessage('🔌 Disconnected from chat server!');
-    });
-    
-    // ======================
-    // EVENT LISTENERS
-    // ======================
-    
-    spawnBossBtn.addEventListener('click', streamerSpawnBoss);
-    boostChatBtn.addEventListener('click', streamerBoostChat);
-    healBossBtn.addEventListener('click', streamerHealBoss);
-    rageBossBtn.addEventListener('click', streamerRageBoss);
-    showHelpBtn.addEventListener('click', () => { commandHelp.style.display = 'block'; });
-    closeHelp.addEventListener('click', () => { commandHelp.style.display = 'none'; });
-    
-    sendTestCommandBtn.addEventListener('click', () => {
-      const command = testCommandInput.value.trim();
-      const username = testUsernameInput.value.trim() || "TestUser";
-      if (command) {
-        processBossCommand(command, username);
-        testCommandInput.value = "";
-      }
-    });
-    
-    testCommandInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') { sendTestCommandBtn.click(); }
-    });
-    
-    testGiftBtn.addEventListener('click', () => { addTikTokCredits(100); });
-    
-    // ======================
-    // INITIALIZATION
-    // ======================
-    updateBossHealth();
-    updateScoreboard();
-    updateCreditsDisplay();
-    generatePixelBoss(currentBoss);
-    bossAvatarWrapper.classList.add('bossEntrance');
-    setTimeout(() => { bossAvatarWrapper.classList.remove('bossEntrance'); }, 800);
-    addChatMessage('🎮 Welcome to CHAT vs BOSS: ULTIMATE PIXEL HORROR! Type numbers 1-9 to attack, 0 to heal, 10 for a special attack (Lvl 5+), and !assist if on a combo streak.');
-    addChatMessage(`💀 ${currentBoss.description}`);
-    
-    // Note: Periodic boss attacks remain removed – the boss now only counterattacks when players act.
-  </script>
 </body>
 </html>
