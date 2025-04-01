@@ -29,43 +29,45 @@
       flex-direction: column;
       align-items: center;
       background: rgba(0,0,0,0.4);
-      padding: 20px 40px;
+      padding: 20px 30px;
       border-radius: 16px;
       box-shadow: 0 0 40px rgba(0, 0, 0, 0.6);
-      max-width: 90vw;
+      width: 90vw;
+      height: 85vh;
       overflow: hidden;
     }
 
     .top-label {
-      font-size: 24px;
+      font-size: 28px;
       color: #fff;
-      margin-bottom: 12px;
+      margin-bottom: 16px;
       text-shadow: 0 0 5px black;
     }
 
     .carousel {
       display: flex;
-      width: 100%;
-      animation: slidePages 24s ease-in-out infinite;
-      transition: transform 1s ease-in-out;
+      width: 300%;
+      animation: bouncePages 24s steps(1) infinite;
     }
 
 
-    @keyframes slidePages {
-      0%, 12.5%   { transform: translateX(0%); }
-      12.6%, 25%  { transform: translateX(-100%); }
-      25.1%, 37.5%{ transform: translateX(-200%); }
-      37.6%, 50%  { transform: translateX(-300%); }
-      50.1%, 62.5%{ transform: translateX(-200%); }
-      62.6%, 75%  { transform: translateX(-100%); }
-      75.1%, 100% { transform: translateX(0%); }
+
+    @keyframes bouncePages {
+      0%, 16.6%   { transform: translateX(0%); }
+      33.3%       { transform: translateX(-100%); }
+      50%         { transform: translateX(-200%); }
+      66.6%       { transform: translateX(-100%); }
+      83.3%, 100% { transform: translateX(0%); }
     }
+
 
     .page {
       display: flex;
       flex: 0 0 100%;
       justify-content: center;
+      align-items: center;
       gap: 40px;
+      padding: 10px;
     }
 
     .pair {
@@ -86,24 +88,24 @@
     }
 
     .pair img {
-      height: 100px;
+      height: 140px;
       width: auto;
-      margin: 0 8px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(255,255,255,0.3);
+      margin: 0 10px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(255,255,255,0.4);
     }
 
     .equals {
-      font-size: 30px;
+      font-size: 36px;
       color: white;
       font-weight: bold;
       text-shadow: 0 0 5px black;
     }
 
     .label {
-      font-size: 14px;
+      font-size: 16px;
       color: #eee;
-      margin-top: 4px;
+      margin-top: 6px;
       text-align: center;
       text-shadow: 0 0 3px black;
     }
@@ -211,7 +213,6 @@
           <div class="label">Super GG → Dragun Boss</div>
         </div>
       </div>
-
     </div>
   </div>
 </body>
