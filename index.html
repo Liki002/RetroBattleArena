@@ -66,7 +66,7 @@
       overflow: hidden;
     }
 
-    /* Player Info Display */
+    /* Player Info Display (Top Left) */
     .player-info {
       position: absolute;
       top: 40px;
@@ -94,10 +94,40 @@
       to { opacity: 1; }
     }
 
+    /* Side Stats Panel (Viewers, Likes & Gifts on Left Under Player Info) */
+    .side-stats {
+      position: absolute;
+      top: 110px;  /* Adjusted spacing from player info */
+      left: 60px;
+      z-index: 20;
+      color: white;
+      font-family: 'Press Start 2P', cursive;
+    }
+    
+    .side-stats .stat-item {
+      margin-bottom: 10px;
+      font-size: 16px;
+    }
+    
+    .viewer-count {
+      color: var(--neon-pink);
+      text-shadow: 0 0 5px var(--neon-pink);
+    }
+    
+    .like-count {
+      color: var(--neon-cyan);
+      text-shadow: 0 0 5px var(--neon-cyan);
+    }
+    
+    .gift-count {
+      color: var(--neon-yellow);
+      text-shadow: 0 0 5px var(--neon-yellow);
+    }
+
     /* Main Game Display Area */
     .game-display {
       position: absolute;
-      top: 250px; 
+      top: 250px;
       left: 60px;
       right: 60px;
       height: 750px; 
@@ -175,42 +205,6 @@
       color: var(--neon-purple);
       border-left: 4px solid var(--neon-purple);
     }
-    
-    .username {
-      font-weight: bold;
-      margin-right: 5px;
-    }
-
-    /* Stats Panel */
-    .stats-panel {
-      position: absolute;
-      top: 130px; 
-      right: 60px;
-      z-index: 20;
-      color: white;
-      font-family: 'Press Start 2P', cursive;
-      text-align: right;
-    }
-    
-    .stat-item {
-      margin-bottom: 10px;
-      font-size: 16px;
-    }
-    
-    .viewer-count {
-      color: var(--neon-pink);
-      text-shadow: 0 0 5px var(--neon-pink);
-    }
-    
-    .like-count {
-      color: var(--neon-cyan);
-      text-shadow: 0 0 5px var(--neon-cyan);
-    }
-    
-    .gift-count {
-      color: var(--neon-yellow);
-      text-shadow: 0 0 5px var(--neon-yellow);
-    }
 
     /* Floating Pixel Particles */
     .pixel-particle {
@@ -245,14 +239,14 @@
 <body>
   <div class="crt-effect">
     <div class="arcade-cabinet">
-      <!-- Player Info -->
+      <!-- Player Info (Top Left) -->
       <div class="player-info">
         <div class="player-name">LIKI8BIT</div>
         <div class="player-level">LEVEL 87</div>
       </div>
       
-      <!-- Stats Panel -->
-      <div class="stats-panel">
+      <!-- Side Stats Panel (Under Player Info on Left) -->
+      <div class="side-stats">
         <div class="stat-item viewer-count">VIEWERS: <span id="viewerCount">0</span></div>
         <div class="stat-item like-count">LIKES: <span id="likeCount">0</span></div>
         <div class="stat-item gift-count">GIFTS: <span id="giftCount">0</span></div>
@@ -275,11 +269,10 @@
 
   <!-- Open a WebSocket connection to your local server -->
   <script>
-    // Use a fixed URL (e.g., ws://localhost:55001) since you're running your server locally.
+    // Use a fixed URL for local testing
     const ws = new WebSocket('ws://localhost:55001');
     ws.addEventListener('open', () => {
       console.log('WebSocket connection established.');
-      // Optionally add a system message here
     });
     ws.addEventListener('message', event => {
       const data = JSON.parse(event.data);
