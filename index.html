@@ -34,11 +34,7 @@
       width: 100%;
       height: 100%;
       overflow: hidden;
-      background: 
-        radial-gradient(circle at center, 
-          transparent 0%, 
-          rgba(0, 240, 255, 0.03) 70%, 
-          transparent 100%);
+      background: radial-gradient(circle at center, transparent 0%, rgba(0, 240, 255, 0.03) 70%, transparent 100%);
     }
     
     .crt-effect::before {
@@ -48,9 +44,7 @@
       left: 0;
       right: 0;
       bottom: 0;
-      background: 
-        linear-gradient(rgba(0, 240, 255, 0.03) 50%, 
-        transparent 50%);
+      background: linear-gradient(rgba(0, 240, 255, 0.03) 50%, transparent 50%);
       background-size: 100% 4px;
       pointer-events: none;
       z-index: 100;
@@ -241,10 +235,7 @@
       left: 0;
       right: 0;
       bottom: 0;
-      background: linear-gradient(
-        to bottom,
-        rgba(0, 240, 255, 0.05) 50%,
-        transparent 50%);
+      background: linear-gradient(to bottom, rgba(0, 240, 255, 0.05) 50%, transparent 50%);
       background-size: 100% 4px;
       pointer-events: none;
       z-index: 10;
@@ -282,62 +273,79 @@
     </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@zerodytrash/tiktok-live-connector@0.9.20/dist/TikTokLiveConnector.min.js"></script>
+  <!-- Include Socket.IO client (served by your Node server) -->
+  <script src="/socket.io/socket.io.js"></script>
   
+  <!-- Now, initialize the Socket.IO connection and listen for events from the server -->
   <script>
-    // Configuration
-    const config = {
-      username: "Liki8bit",
-      level: 87,
-      tiktokUsername: "liki8bit" // Your TikTok username
-    };
-    
-    // State
+    const socket = io();
+
+    socket.on('chat', (data) => {
+      // data.msg is the chat message
+      addEvent('chat', data.username, data.msg);
+    });
+
+    socket.on('gift', (data) => {
+      addEvent('gift', data.username, data.gift, data.diamonds);
+    });
+
+    socket.on('like', (data) => {
+      addEvent('like', data.username, '', data.likeCount);
+    });
+
+    socket.on('follow', (data) => {
+      addEvent('follow', data.username);
+    });
+
+    socket.on('viewerCountUpdate', (data) => {
+      viewerCount = data.viewerCount;
+      document.getElementById('viewerCount').textContent = viewerCount;
+    });
+  </script>
+
+  <!-- The TikTokLiveConnector code is no longer needed on the client side -->
+  <!-- All TikTok events are now received via the server and Socket.IO -->
+  
+  <!-- Your existing client-side code for particles and addEvent remains below -->
+  <script>
+    // State variables (if needed globally)
     let viewerCount = 0;
     let likeCount = 0;
     let giftCount = 0;
-    
+
     // DOM Elements
     const eventFeed = document.getElementById('eventFeed');
     const viewerCountEl = document.getElementById('viewerCount');
     const likeCountEl = document.getElementById('likeCount');
     const giftCountEl = document.getElementById('giftCount');
-    
+
     // Create floating pixel particles
     function createParticles() {
       const particlesContainer = document.querySelector('.arcade-cabinet');
       const particleCount = 100;
-      
       for (let i = 0; i < particleCount; i++) {
         const particle = document.createElement('div');
         particle.classList.add('pixel-particle');
-        
-        // Random properties
         const size = Math.floor(Math.random() * 3) + 2;
         const posX = Math.random() * 100 + '%';
         const delay = Math.random() * -20;
         const duration = Math.random() * 10 + 5;
         const opacity = Math.random() * 0.4 + 0.2;
-        
-        // Apply styles
         particle.style.setProperty('--pixel-size', `${size}px`);
         particle.style.left = posX;
         particle.style.animationDelay = `${delay}s`;
         particle.style.animationDuration = `${duration}s`;
         particle.style.opacity = opacity;
-        
         particlesContainer.appendChild(particle);
       }
     }
-    
+
     // Add event to feed
     function addEvent(type, username, message = '', value = 0) {
       const event = document.createElement('div');
       event.className = `event-message ${type}-event`;
-      
       let icon = '';
       let formattedMessage = '';
-      
       switch(type) {
         case 'chat':
           icon = '💬';
@@ -366,55 +374,17 @@
           viewerCountEl.textContent = viewerCount;
           break;
       }
-      
       event.innerHTML = `${icon} ${formattedMessage}`;
       eventFeed.prepend(event);
-      
       // Limit to 50 messages
       if (eventFeed.children.length > 50) {
         eventFeed.removeChild(eventFeed.lastChild);
       }
     }
-    
-    // Initialize TikTok Live Connector
-    function initializeTikTokConnection() {
-      const tiktokLive = new TikTokLiveConnector({
-        host: config.tiktokUsername
-      });
-      
-      tiktokLive.connect();
-      
-      // Event listeners for TikTok Live events
-      tiktokLive.on('connected', () => {
-        addEvent('chat', 'System', 'Connected to TikTok Live!');
-      });
-      
-      tiktokLive.on('chat', (data) => {
-        addEvent('chat', data.nickname || data.uniqueId, data.comment);
-      });
-      
-      tiktokLive.on('gift', (data) => {
-        addEvent('gift', data.nickname || data.uniqueId, data.giftName, data.diamondCount);
-      });
-      
-      tiktokLive.on('like', (data) => {
-        addEvent('like', data.nickname || data.uniqueId, '', data.likeCount);
-      });
-      
-      tiktokLive.on('follow', (data) => {
-        addEvent('follow', data.nickname || data.uniqueId);
-      });
-      
-      tiktokLive.on('viewerCountUpdate', (data) => {
-        viewerCount = data.viewerCount;
-        viewerCountEl.textContent = viewerCount;
-      });
-    }
-    
-    // Initialize
+
+    // Initialize everything when DOM is ready
     document.addEventListener('DOMContentLoaded', function() {
       createParticles();
-      initializeTikTokConnection();
     });
   </script>
 </body>
