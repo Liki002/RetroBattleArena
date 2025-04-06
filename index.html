@@ -97,7 +97,7 @@
     /* Main Game Display Area */
     .game-display {
       position: absolute;
-      top: 250px; /* Adjusted to move the game display down */
+      top: 250px; 
       left: 60px;
       right: 60px;
       height: 750px; 
@@ -184,7 +184,7 @@
     /* Stats Panel */
     .stats-panel {
       position: absolute;
-      top: 130px; /* Adjusted to move it further down */
+      top: 130px; 
       right: 60px;
       z-index: 20;
       color: white;
@@ -273,53 +273,54 @@
     </div>
   </div>
 
-  <!-- Include Socket.IO client (served by your Node server) -->
-  <script src="/socket.io/socket.io.js"></script>
-  
-  <!-- Now, initialize the Socket.IO connection and listen for events from the server -->
+  <!-- Open a WebSocket connection to your local server -->
   <script>
-    const socket = io();
-
-    socket.on('chat', (data) => {
-      // data.msg is the chat message
-      addEvent('chat', data.username, data.msg);
+    // Use a fixed URL (e.g., ws://localhost:55001) since you're running your server locally.
+    const ws = new WebSocket('ws://localhost:55001');
+    ws.addEventListener('open', () => {
+      console.log('WebSocket connection established.');
+      // Optionally add a system message here
     });
-
-    socket.on('gift', (data) => {
-      addEvent('gift', data.username, data.gift, data.diamonds);
+    ws.addEventListener('message', event => {
+      const data = JSON.parse(event.data);
+      switch(data.type) {
+        case 'chat':
+          addEvent('chat', data.username, data.msg);
+          break;
+        case 'gift':
+          addEvent('gift', data.username, data.gift, data.diamonds);
+          break;
+        case 'like':
+          addEvent('like', data.username, '', data.likeCount);
+          break;
+        case 'follow':
+          addEvent('follow', data.username);
+          break;
+        case 'viewerCountUpdate':
+          viewerCount = data.viewerCount;
+          document.getElementById('viewerCount').textContent = viewerCount;
+          break;
+      }
     });
-
-    socket.on('like', (data) => {
-      addEvent('like', data.username, '', data.likeCount);
+    ws.addEventListener('error', error => {
+      console.error('WebSocket error:', error);
     });
-
-    socket.on('follow', (data) => {
-      addEvent('follow', data.username);
-    });
-
-    socket.on('viewerCountUpdate', (data) => {
-      viewerCount = data.viewerCount;
-      document.getElementById('viewerCount').textContent = viewerCount;
+    ws.addEventListener('close', () => {
+      console.log('WebSocket connection closed.');
     });
   </script>
 
-  <!-- The TikTokLiveConnector code is no longer needed on the client side -->
-  <!-- All TikTok events are now received via the server and Socket.IO -->
-  
-  <!-- Your existing client-side code for particles and addEvent remains below -->
+  <!-- Client-side code for particles and event handling -->
   <script>
-    // State variables (if needed globally)
     let viewerCount = 0;
     let likeCount = 0;
     let giftCount = 0;
 
-    // DOM Elements
     const eventFeed = document.getElementById('eventFeed');
     const viewerCountEl = document.getElementById('viewerCount');
     const likeCountEl = document.getElementById('likeCount');
     const giftCountEl = document.getElementById('giftCount');
 
-    // Create floating pixel particles
     function createParticles() {
       const particlesContainer = document.querySelector('.arcade-cabinet');
       const particleCount = 100;
@@ -340,7 +341,6 @@
       }
     }
 
-    // Add event to feed
     function addEvent(type, username, message = '', value = 0) {
       const event = document.createElement('div');
       event.className = `event-message ${type}-event`;
@@ -376,13 +376,11 @@
       }
       event.innerHTML = `${icon} ${formattedMessage}`;
       eventFeed.prepend(event);
-      // Limit to 50 messages
       if (eventFeed.children.length > 50) {
         eventFeed.removeChild(eventFeed.lastChild);
       }
     }
 
-    // Initialize everything when DOM is ready
     document.addEventListener('DOMContentLoaded', function() {
       createParticles();
     });
