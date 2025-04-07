@@ -94,10 +94,10 @@
       to { opacity: 1; }
     }
 
-    /* Side Stats Panel (Under Player Info on Left) */
+    /* Side Stats Panel (Viewers, Likes & Gifts on Left Under Player Info) */
     .side-stats {
       position: absolute;
-      top: 110px;
+      top: 110px;  /* Adjusted spacing from player info */
       left: 60px;
       z-index: 20;
       color: white;
@@ -123,28 +123,6 @@
       color: var(--neon-yellow);
       text-shadow: 0 0 5px var(--neon-yellow);
     }
-    
-    /* Follow Goal */
-    .follow-goal {
-      margin-top: 10px;
-    }
-    .follow-goal span {
-      font-size: 14px;
-    }
-    progress {
-      width: 100%;
-      height: 20px;
-      -webkit-appearance: none;
-      appearance: none;
-    }
-    progress::-webkit-progress-bar {
-      background-color: #333;
-      border-radius: 4px;
-    }
-    progress::-webkit-progress-value {
-      background-color: var(--neon-pink);
-      border-radius: 4px;
-    }
 
     /* Main Game Display Area */
     .game-display {
@@ -163,37 +141,7 @@
       z-index: 3;
     }
 
-    /* Leaderboard (Between Game Display & Chat) */
-    .leaderboard {
-      position: absolute;
-      top: 1020px;
-      left: 60px;
-      z-index: 20;
-      background: rgba(0, 0, 0, 0.8);
-      padding: 10px;
-      border-radius: 4px;
-      max-width: 300px;
-      max-height: 100px;
-      overflow-y: auto;
-      color: white;
-      font-family: 'Press Start 2P', cursive;
-      box-shadow: 0 0 15px rgba(255, 45, 117, 0.3);
-    }
-    .leaderboard h2 {
-      margin: 0 0 10px 0;
-      font-size: 18px;
-    }
-    .leaderboard ul {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
-    .leaderboard li {
-      font-size: 14px;
-      margin-bottom: 5px;
-    }
-
-    /* Chat Display */
+    /* Enhanced Chat Display with Event Feed */
     .chat-display {
       position: absolute;
       bottom: 40px;
@@ -220,18 +168,7 @@
       font-size: 18px;
       line-height: 1.4;
     }
-    /* Custom scrollbar for chat feed */
-    .event-feed::-webkit-scrollbar {
-      width: 8px;
-    }
-    .event-feed::-webkit-scrollbar-track {
-      background: rgba(255, 255, 255, 0.1);
-    }
-    .event-feed::-webkit-scrollbar-thumb {
-      background: var(--neon-pink);
-      border-radius: 4px;
-    }
-
+    
     .event-message {
       margin-bottom: 10px;
       padding: 8px 12px;
@@ -297,54 +234,9 @@
       pointer-events: none;
       z-index: 10;
     }
-
-    /* Notification Styles */
-    .notification-container {
-      position: fixed;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 1000;
-    }
-    .notification {
-      background: rgba(0,0,0,0.7);
-      color: #fff;
-      padding: 10px 20px;
-      margin: 5px;
-      border-radius: 4px;
-      animation: slideDown 0.5s ease-out;
-    }
-    @keyframes slideDown {
-      from { transform: translateY(-100%); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
-    }
-    .notification.fade-out {
-      animation: fadeOut 1s forwards;
-    }
-    @keyframes fadeOut {
-      to { opacity: 0; }
-    }
-
-    /* Screen Shake */
-    .shake {
-      animation: shake 0.5s;
-    }
-    @keyframes shake {
-      0% { transform: translate(1px, 1px) rotate(0deg); }
-      10% { transform: translate(-1px, -2px) rotate(-1deg); }
-      20% { transform: translate(-3px, 0px) rotate(1deg); }
-      30% { transform: translate(3px, 2px) rotate(0deg); }
-      40% { transform: translate(1px, -1px) rotate(1deg); }
-      50% { transform: translate(-1px, 2px) rotate(-1deg); }
-      60% { transform: translate(-3px, 1px) rotate(0deg); }
-      70% { transform: translate(3px, 1px) rotate(-1deg); }
-      80% { transform: translate(-1px, -1px) rotate(1deg); }
-      90% { transform: translate(1px, 2px) rotate(0deg); }
-      100% { transform: translate(1px, -2px) rotate(-1deg); }
-    }
   </style>
 </head>
-<body class="theme-dark">
+<body>
   <div class="crt-effect">
     <div class="arcade-cabinet">
       <!-- Player Info (Top Left) -->
@@ -358,26 +250,15 @@
         <div class="stat-item viewer-count">VIEWERS: <span id="viewerCount">0</span></div>
         <div class="stat-item like-count">LIKES: <span id="likeCount">0</span></div>
         <div class="stat-item gift-count">GIFTS: <span id="giftCount">0</span></div>
-        <div class="stat-item follow-goal">
-          FOLLOW GOAL: <span id="followCurrent">0</span>/<span id="followTarget">100</span>
-          <br>
-          <progress id="followProgress" value="0" max="100"></progress>
-        </div>
       </div>
       
       <!-- Main Game Display -->
       <div class="game-display"></div>
-
-      <!-- Leaderboard (Between Game Display & Chat) -->
-      <div class="leaderboard">
-        <h2>Leaderboard</h2>
-        <ul id="leaderboardList"></ul>
-      </div>
       
       <!-- Chat and Event Display -->
       <div class="chat-display">
         <div class="event-feed" id="eventFeed">
-          <!-- Chat messages and events appear here -->
+          <!-- Events will appear here -->
         </div>
       </div>
       
@@ -386,12 +267,9 @@
     </div>
   </div>
 
-  <!-- Notification Container -->
-  <div class="notification-container"></div>
-
   <!-- Open a WebSocket connection to your local server -->
   <script>
-    // Connect to your local WebSocket server
+    // Use a fixed URL for local testing
     const ws = new WebSocket('ws://localhost:55001');
     ws.addEventListener('open', () => {
       console.log('WebSocket connection established.');
@@ -401,26 +279,15 @@
       switch(data.type) {
         case 'chat':
           addEvent('chat', data.username, data.msg);
-          triggerNotification('New chat from ' + data.username);
-          playSound('audio-chat');
           break;
         case 'gift':
           addEvent('gift', data.username, data.gift, data.diamonds);
-          triggerNotification('Gift from ' + data.username);
-          playSound('audio-gift');
-          updateLeaderboard(data.username, data.diamonds);
-          screenShake();
           break;
         case 'like':
           addEvent('like', data.username, '', data.likeCount);
-          triggerNotification('Like from ' + data.username);
-          playSound('audio-like');
           break;
         case 'follow':
           addEvent('follow', data.username);
-          triggerNotification('Follow from ' + data.username);
-          playSound('audio-follow');
-          updateFollowGoal(data.username);
           break;
         case 'viewerCountUpdate':
           viewerCount = data.viewerCount;
@@ -436,25 +303,16 @@
     });
   </script>
 
-  <!-- Audio elements for sound effects -->
-  <audio id="audio-follow" src="tyforthefollow-stitch.wav"></audio>
-  <audio id="audio-gift" src="Tyforthegift-wacky.wav"></audio>
-  <audio id="audio-like" src="tyforthelike.wav"></audio>
-  <audio id="audio-chat" src="pop_7e9Is8L.wav"></audio>
-
-  <!-- Client-side code for particles, events, notifications, leaderboard, follow goal -->
+  <!-- Client-side code for particles and event handling -->
   <script>
     let viewerCount = 0;
     let likeCount = 0;
     let giftCount = 0;
-    let followCount = 0;
-    const followTarget = 100; // Set your follow goal target here
+
     const eventFeed = document.getElementById('eventFeed');
     const viewerCountEl = document.getElementById('viewerCount');
     const likeCountEl = document.getElementById('likeCount');
     const giftCountEl = document.getElementById('giftCount');
-    const followCurrentEl = document.getElementById('followCurrent');
-    const followProgressEl = document.getElementById('followProgress');
 
     function createParticles() {
       const particlesContainer = document.querySelector('.arcade-cabinet');
@@ -481,7 +339,7 @@
       event.className = `event-message ${type}-event`;
       let icon = '';
       let formattedMessage = '';
-      switch (type) {
+      switch(type) {
         case 'chat':
           icon = '💬';
           formattedMessage = `<span class="username">${username}:</span> ${message}`;
@@ -516,69 +374,7 @@
       }
     }
 
-    function triggerNotification(message) {
-      const container = document.querySelector('.notification-container');
-      const notif = document.createElement('div');
-      notif.className = 'notification';
-      notif.innerText = message;
-      container.appendChild(notif);
-      setTimeout(() => {
-        notif.classList.add('fade-out');
-        setTimeout(() => {
-          container.removeChild(notif);
-        }, 1000);
-      }, 2000);
-    }
-
-    function playSound(audioId) {
-      const audio = document.getElementById(audioId);
-      if (audio) {
-        audio.currentTime = 0;
-        audio.play();
-      }
-    }
-
-    function screenShake() {
-      const cabinet = document.querySelector('.arcade-cabinet');
-      cabinet.classList.add('shake');
-      setTimeout(() => {
-        cabinet.classList.remove('shake');
-      }, 500);
-    }
-
-    // Leaderboard logic
-    const leaderboard = {};
-    function updateLeaderboard(username, value) {
-      if (leaderboard[username]) {
-        leaderboard[username] += value;
-      } else {
-        leaderboard[username] = value;
-      }
-      renderLeaderboard();
-    }
-
-    function renderLeaderboard() {
-      const list = document.getElementById('leaderboardList');
-      list.innerHTML = '';
-      const sorted = Object.entries(leaderboard).sort((a, b) => b[1] - a[1]);
-      sorted.forEach(([user, score]) => {
-        const li = document.createElement('li');
-        li.innerText = `${user}: ${score}`;
-        list.appendChild(li);
-      });
-    }
-
-    // Follow goal update function
-    function updateFollowGoal(username) {
-      followCount++;
-      followCurrentEl.textContent = followCount;
-      followProgressEl.value = followCount;
-      if (followCount >= followTarget) {
-        triggerNotification('Follow Goal Reached!');
-      }
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', function() {
       createParticles();
     });
   </script>
