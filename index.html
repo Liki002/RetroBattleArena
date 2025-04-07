@@ -124,7 +124,7 @@
       text-shadow: 0 0 5px var(--neon-yellow);
     }
     
-    /* Follow Goal (New!) */
+    /* Follow Goal */
     .follow-goal {
       margin-top: 10px;
     }
@@ -392,7 +392,6 @@
   <!-- Open a WebSocket connection to your local server -->
   <script>
     // Connect to your local WebSocket server
-    // Use a fixed URL for local testing
     const ws = new WebSocket('ws://localhost:55001');
     ws.addEventListener('open', () => {
       console.log('WebSocket connection established.');
@@ -574,7 +573,6 @@
       followCount++;
       followCurrentEl.textContent = followCount;
       followProgressEl.value = followCount;
-      // Optionally, trigger a special notification when goal reached
       if (followCount >= followTarget) {
         triggerNotification('Follow Goal Reached!');
       }
