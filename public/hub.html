@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1080, initial-scale=1.0">
+  <title>TikTok Arcade Hub</title>
+  <style>
+    body {
+      background: #0a0a12;
+      color: #00f0ff;
+      font-family: 'Orbitron', sans-serif;
+      text-align: center;
+      padding-top: 100px;
+    }
+    h1 {
+      font-size: 36px;
+      margin-bottom: 20px;
+    }
+    button {
+      font-family: 'Press Start 2P', cursive;
+      padding: 10px 20px;
+      font-size: 16px;
+      margin: 20px;
+      background: transparent;
+      border: 3px solid #ff2d75;
+      color: #ff2d75;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: background 0.3s, color 0.3s;
+    }
+    button:hover {
+      background: #ff2d75;
+      color: #fff;
+    }
+    .section {
+      margin-top: 40px;
+    }
+    .sound-upload {
+      margin-top: 20px;
+    }
+    input[type="text"] {
+      padding: 8px;
+      width: 300px;
+      border: 2px solid #ff2d75;
+      border-radius: 4px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 14px;
+      background: #0a0a12;
+      color: #00f0ff;
+    }
+    #soundList p {
+      margin: 5px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <h1>TikTok Arcade Hub</h1>
+  <p>Use this hub to launch your overlay and add custom sounds when you're about to go live.</p>
+  
+  <div class="section">
+    <button id="connectBtn">Connect to Server & Launch Overlay</button>
+  </div>
+
+  <div class="section">
+    <h2>Overlays</h2>
+    <p>Available overlay: Retro Arcade Overlay</p>
+    <button onclick="window.open('index.html','_blank')">Launch Retro Arcade Overlay</button>
+  </div>
+
+  <div class="section sound-upload">
+    <h2>Add Custom Sound</h2>
+    <p>Paste the URL of a sound file below:</p>
+    <input type="text" id="soundUrl" placeholder="https://example.com/sound.wav">
+    <button id="addSoundBtn">Add Sound</button>
+    <div id="soundList"></div>
+  </div>
+
+  <script>
+    // When clicked, open the overlay in a new window.
+    document.getElementById('connectBtn').addEventListener('click', () => {
+      window.open('index.html', '_blank');
+    });
+
+    // Add custom sound URL to a list (for reference; you could later pass this to the overlay)
+    document.getElementById('addSoundBtn').addEventListener('click', () => {
+      const url = document.getElementById('soundUrl').value;
+      if(url) {
+        const soundList = document.getElementById('soundList');
+        const p = document.createElement('p');
+        p.textContent = url;
+        soundList.appendChild(p);
+        document.getElementById('soundUrl').value = '';
+      }
+    });
+  </script>
+</body>
+</html>
